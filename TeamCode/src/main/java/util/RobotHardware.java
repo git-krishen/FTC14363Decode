@@ -30,7 +30,7 @@ public class RobotHardware {
     public GamepadEx driver;
 
     // Limelight
-    Limelight3A limelight;
+    public Limelight3A limelight;
 
     // Subsystems
     public MecanumDrive drivetrain;
@@ -66,6 +66,7 @@ public class RobotHardware {
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.setPollRateHz(100);
+        limelight.pipelineSwitch(0);
         limelight.start();
 
         drivetrain = new MecanumDrive();
@@ -93,6 +94,7 @@ public class RobotHardware {
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.setPollRateHz(100);
+        limelight.pipelineSwitch(0);
         limelight.start();
 
         drivetrain = new MecanumDrive();

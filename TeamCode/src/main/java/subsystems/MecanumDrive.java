@@ -1,6 +1,7 @@
 package subsystems;
 
 import com.arcrobotics.ftclib.command.Subsystem;
+import com.arcrobotics.ftclib.geometry.Pose2d;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import util.RobotHardware;
@@ -10,8 +11,19 @@ public class MecanumDrive implements Subsystem {
     private double leftFrontPower, leftRearPower, rightFrontPower, rightRearPower, heading;
     private boolean slowmode;
 
+    private Pose2d pose;
+
     public MecanumDrive() {
         this.robot = RobotHardware.getInstance();
+        this.pose = new Pose2d();
+    }
+
+    public Pose2d getCurrentPose() {
+        return pose;
+    }
+
+    public void setCurrentPose(Pose2d pose) {
+        this.pose = pose;
     }
 
     public void setSlowMode(boolean set) {

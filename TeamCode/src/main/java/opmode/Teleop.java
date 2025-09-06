@@ -18,7 +18,6 @@ public class Teleop extends CommandOpMode {
     private final RobotHardware robot = RobotHardware.getInstance();
     private GamepadEx driver;
     // Maybe I need to set states here???
-    private MecanumDrive drivetrain;
 
 
     @Override
@@ -27,23 +26,21 @@ public class Teleop extends CommandOpMode {
         driver = new GamepadEx(gamepad1);
         robot.init(hardwareMap, driver);
         // Would add telemetry here
-
-        drivetrain = new MecanumDrive();
     }
 
     @Override
     public void run() {
         CommandScheduler.getInstance().run();
-        drivetrain.setDefaultCommand(new RunCommand(() -> {
+        robot.drivetrain.setDefaultCommand(new RunCommand(() -> {
             double ly = Math.abs(driver.getLeftY()) > 0.15 ? driver.getLeftY() : 0;
             double lx = Math.abs(driver.getLeftX()) > 0.15 ? driver.getLeftX() : 0;
             double rx = Math.abs(driver.getRightX()) > 0.15 ? driver.getRightX() : 0;
-            drivetrain.drive(
+            robot.drivetrain.drive(
                     ly,
                     lx,
                     rx
             );
-        }, drivetrain));
+        }, robot.drivetrain));
 
         driver.getGamepadButton(GamepadKeys.Button.A).whenPressed(
                 new InstantCommand(() -> robot.imu.resetYaw())
@@ -51,8 +48,8 @@ public class Teleop extends CommandOpMode {
 
         driver.getGamepadButton(GamepadKeys.Button.B).whileHeld(
                 new StartEndCommand(
-                        () -> drivetrain.setSlowMode(true),
-                        () -> drivetrain.setSlowMode(false)
+                        () -> robot.drivetrain.setSlowMode(true),
+                        () -> robot.drivetrain.setSlowMode(false)
                 )
         );
     }
