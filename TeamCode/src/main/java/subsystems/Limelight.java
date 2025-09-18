@@ -1,20 +1,93 @@
 package subsystems;
 
 import com.arcrobotics.ftclib.command.Subsystem;
-import com.arcrobotics.ftclib.geometry.Pose2d;
-import com.arcrobotics.ftclib.geometry.Rotation2d;
-import com.arcrobotics.ftclib.geometry.Translation2d;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes.*;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.stream.Collectors;
 
 import util.RobotHardware;
 
 public class Limelight implements Subsystem {
-    private RobotHardware robot;
+    private static RobotHardware robot;
+    private static OptionalInt targetID;
 
     public Limelight() {
-        this.robot = RobotHardware.getInstance();
+        robot = RobotHardware.getInstance();
+        targetID = OptionalInt.empty();
+    }
+
+    public static void setTargetID(int id) {
+        targetID = OptionalInt.of(id);
+    }
+
+    public static void setRobotYaw(double angle) {
+        robot.limelight.updateRobotOrientation(angle);
+    }
+
+    public static boolean hasTarget() {
+        return getTagIDList().contains(targetID);
+    }
+
+    public static OptionalDouble getTargetX() {
+        Optional<FiducialResult> targetFiducial = getTargetFiducial();
+        if (targetFiducial.isPresent()) {
+            return OptionalDouble.of(targetFiducial.get().getTargetXDegrees());
+        }
+        return OptionalDouble.empty();
+    }
+
+    public static OptionalDouble getTargetY() {
+        Optional<FiducialResult> targetFiducial = getTargetFiducial();
+        if (targetFiducial.isPresent()) {
+            return OptionalDouble.of(targetFiducial.get().getTargetYDegrees());
+        }
+        return OptionalDouble.empty();
+    }
+
+
+    public static OptionalDouble getTargetArea() {
+        Optional<FiducialResult> targetFiducial = getTargetFiducial();
+        if (targetFiducial.isPresent()) {
+            return OptionalDouble.of(targetFiducial.get().getTargetArea());
+        }
+        return OptionalDouble.empty();
+    }
+
+    public static ArrayList<Integer> getTagIDList() {
+        ArrayList<Integer> tags = new ArrayList<Integer>();
+        List<FiducialResult> fiducials = getFiducialList();
+        for (FiducialResult fiducial : fiducials) {
+            int id = fiducial.getFiducialId();
+            tags.add(id);
+        }
+        return tags;
+    }
+
+    private static List<FiducialResult> getFiducialList() {
+        LLResult result = robot.limelight.getLatestResult();
+        return result.getFiducialResults();
+    }
+
+    private static Optional<FiducialResult> getTargetFiducial() {
+        if (targetID.isEmpty()) {
+            return Optional.empty();
+        }
+        List<FiducialResult> fiducials = getFiducialList();
+        fiducials = fiducials.stream().filter(
+                (f) -> {
+                    return f.getFiducialId() == targetID.getAsInt();
+                }
+        ).collect(Collectors.toList());
+        return !fiducials.isEmpty() ? Optional.of(fiducials.get(0)) : Optional.empty();
     }
 
     @Override
@@ -27,10 +100,8 @@ public class Limelight implements Subsystem {
             if (botPose != null) {
                 double x = botPose.getPosition().x;
                 double y = botPose.getPosition().y;
-                Translation2d fieldTranslation = new Translation2d(x,y);
                 double r = botPose.getOrientation().getYaw();
-                Rotation2d fieldRotation = new Rotation2d(r);
-                Pose2d fieldPose = new Pose2d(fieldTranslation, fieldRotation);
+                Pose fieldPose = new Pose(x,y,r);
                 robot.drivetrain.setCurrentPose(fieldPose);
             }
         }

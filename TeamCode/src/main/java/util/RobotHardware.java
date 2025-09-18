@@ -32,6 +32,9 @@ public class RobotHardware {
     // Limelight
     public Limelight3A limelight;
 
+    // Color Sensor
+//    public ColorSensor colorSensor;
+
     // Subsystems
     public MecanumDrive drivetrain;
 
@@ -44,32 +47,8 @@ public class RobotHardware {
     }
 
     public void init(final HardwareMap hardwareMap, GamepadEx driver) {
-        this.hardwareMap = hardwareMap;
         this.driver = driver;
-
-        // ******************* DRIVETRAIN ******************* //
-        leftFront = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.leftFront);
-        leftRear = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.leftRear);
-        rightRear = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.rightRear);
-        rightFront = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.rightFront);
-
-        leftFront.setDirection(DcMotorEx.Direction.REVERSE); // MAYBE CHANGE
-        leftRear.setDirection(DcMotorEx.Direction.REVERSE); // MAYBE CHANGE
-
-        imu = hardwareMap.get(IMU.class, "imu");
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.UP, //
-                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
-        ));
-        imu.initialize(parameters);
-        imu.resetYaw();
-
-        limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.setPollRateHz(100);
-        limelight.pipelineSwitch(0);
-        limelight.start();
-
-        drivetrain = new MecanumDrive();
+        init(hardwareMap);
     }
 
     public void init(final HardwareMap hardwareMap) {
@@ -92,12 +71,16 @@ public class RobotHardware {
         imu.initialize(parameters);
         imu.resetYaw();
 
+        // ******************* LIMELIGHT ******************* //
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.setPollRateHz(100);
         limelight.pipelineSwitch(0);
         limelight.start();
 
-        drivetrain = new MecanumDrive();
+        // ******************* COLOR SENSOR ******************* //
+//        colorSensor = hardwareMap.get(ColorSensor.class, "colorSensor");
+//
+//        drivetrain = new MecanumDrive();
     }
 
 
