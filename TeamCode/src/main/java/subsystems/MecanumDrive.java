@@ -1,6 +1,8 @@
 package subsystems;
 
 import com.arcrobotics.ftclib.command.Subsystem;
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
@@ -30,6 +32,10 @@ public class MecanumDrive implements Subsystem {
         return pose;
     }
 
+    public boolean getSlowMode() {
+        return slowmode;
+    }
+
     public void setCurrentPose(Pose pose) {
         this.pose = pose;
     }
@@ -50,19 +56,20 @@ public class MecanumDrive implements Subsystem {
     }
 
     public void drive(double ly, double lx, double rx) {
-        System.out.println("driving");
-
-        lx *= 1.1;
-        rx *= 1.1;
+        robot.telemetryManager.debug(String.format("driving %f %f %f", ly, lx, rx));
+        robot.telemetryManager.update();
 
         heading = robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
         double rotX = lx * Math.cos(-heading) - ly * Math.sin(-heading);
         double rotY = lx * Math.sin(-heading) + ly * Math.cos(-heading);
 
-        leftFrontPower = (rotY + rotX + rx);
-        leftRearPower = (rotY - rotX + rx);
-        rightFrontPower = (rotY - rotX - rx);
-        rightRearPower = (rotY + rotX - rx);
+        rotX *= 1.1;
+
+        double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
+        leftFrontPower = (rotY + rotX + rx) / denominator;
+        leftRearPower = (rotY - rotX + rx) / denominator;
+        rightFrontPower = (rotY - rotX - rx) / denominator;
+        rightRearPower = (rotY + rotX - rx) / denominator;
 
         double mult = slowmode ? 0.3 : 1;
 

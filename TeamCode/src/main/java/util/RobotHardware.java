@@ -1,6 +1,8 @@
 package util;
 
 import com.arcrobotics.ftclib.controller.PIDController;
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -38,6 +40,8 @@ public class RobotHardware {
     // Subsystems
     public MecanumDrive drivetrain;
 
+    public TelemetryManager telemetryManager;
+
     public static RobotHardware getInstance() {
         if (instance == null) {
             instance = new RobotHardware();
@@ -53,6 +57,8 @@ public class RobotHardware {
 
     public void init(final HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
+
+        this.telemetryManager = PanelsTelemetry.INSTANCE.getTelemetry();
 
         // ******************* DRIVETRAIN ******************* //
         leftFront = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.leftFront);
@@ -79,8 +85,6 @@ public class RobotHardware {
 
         // ******************* COLOR SENSOR ******************* //
 //        colorSensor = hardwareMap.get(ColorSensor.class, "colorSensor");
-//
-//        drivetrain = new MecanumDrive();
     }
 
 

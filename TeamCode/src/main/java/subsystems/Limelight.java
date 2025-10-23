@@ -92,18 +92,18 @@ public class Limelight implements Subsystem {
 
     @Override
     public void periodic() {
-        LLResult result = robot.limelight.getLatestResult();
-        double robotYaw = robot.imu.getRobotYawPitchRollAngles().getYaw();
-        robot.limelight.updateRobotOrientation(robotYaw);
-        if (result != null && result.isValid()) {
-            Pose3D botPose = result.getBotpose_MT2();
-            if (botPose != null) {
-                double x = botPose.getPosition().x;
-                double y = botPose.getPosition().y;
-                double r = botPose.getOrientation().getYaw();
-                Pose fieldPose = new Pose(x,y,r);
-                robot.drivetrain.setCurrentPose(fieldPose);
-            }
-        }
+//        LLResult result = robot.limelight.getLatestResult();
+//        double robotYaw = robot.imu.getRobotYawPitchRollAngles().getYaw();
+//        robot.limelight.updateRobotOrientation(robotYaw);
+//        if (result != null && result.isValid()) {
+//            Pose3D botPose = result.getBotpose_MT2();
+//            if (botPose != null) {
+//                double x = botPose.getPosition().x;
+//                double y = botPose.getPosition().y;
+//                double r = botPose.getOrientation().getYaw();
+//                Pose fieldPose = new Pose(x,y,r);
+//                robot.drivetrain.setCurrentPose(fieldPose);
+//            }
+//        }
     }
 }
