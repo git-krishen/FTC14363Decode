@@ -12,6 +12,9 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import subsystems.Intake;
+import subsystems.Outtake;
+
 @Autonomous(name = "TestAuto", group = "Test")
 public class TestPath extends OpMode {
     private Follower follower;
@@ -26,6 +29,9 @@ public class TestPath extends OpMode {
 
     // Paths
     private PathChain line, curve;
+
+    private Intake intake;
+    private Outtake outtake;
 
     public void buildPaths() {
         line = follower.pathBuilder()
@@ -46,6 +52,11 @@ public class TestPath extends OpMode {
                 break;
             case 1:
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+                if (follower.getPathCompletion() < 0.5) {
+                    intake.setIntakeMotorVelocity(Math.PI*2);
+                } else {
+                    intake.stopMotor();
+                }
                 if(!follower.isBusy()) {
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
                     follower.followPath(curve,true);
@@ -96,6 +107,8 @@ public class TestPath extends OpMode {
         buildPaths();
         follower.setStartingPose(startPose);
 
+        intake = new Intake();
+        outtake = new Outtake();
     }
 
     /** This method is called continuously after Init while waiting for "play". **/

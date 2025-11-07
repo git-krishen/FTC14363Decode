@@ -44,15 +44,16 @@ public class MecanumDrive implements Subsystem {
         slowmode = set;
     }
 
-    public DoubleSupplier driveToPose(Pose target, HardwareMap hardwareMap) {
+    public Follower driveToPose(Pose target, HardwareMap hardwareMap) {
         Pose a = new Pose();
         Follower follower = Constants.createFollower(hardwareMap);
+        follower.activateAllPIDFs();
         PathChain path = follower.pathBuilder()
                 .addPath(new BezierLine(getCurrentPose(), target))
                 .setLinearHeadingInterpolation(getCurrentPose().getHeading(), target.getHeading())
                 .build();
         follower.followPath(path);
-        return follower::getPathCompletion;
+        return follower;
     }
 
     public void drive(double ly, double lx, double rx) {

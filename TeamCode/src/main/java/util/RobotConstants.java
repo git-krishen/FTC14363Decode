@@ -7,4 +7,16 @@ public class RobotConstants {
         public static String rightFront = "frontRightMotor";
         public static String rightRear = "backRightMotor";
     }
+
+    public static class Intake {
+        public static String intake = "intakeMotor";
+        public static double intakeVelocity = Math.PI*2;
+    }
+
+    public static class Outtake {
+        public static String outtake = "outtakeMotor";
+        public static String feeder = "feederMotor";
+        public static double feederVelocity = Math.PI*3;
+        public static double outtakeVelocity = Math.PI*3;
+    }
 }

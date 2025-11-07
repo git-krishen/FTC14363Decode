@@ -29,6 +29,13 @@ public class RobotHardware {
     private static RobotHardware instance = null;
     private boolean enabled;
 
+    // Intake
+    public DcMotorEx intakeMotor;
+
+    // Outtake
+    public DcMotorEx outtakeMotor;
+    public DcMotorEx feederMotor;
+
     public GamepadEx driver;
 
     // Limelight
@@ -36,9 +43,6 @@ public class RobotHardware {
 
     // Color Sensor
 //    public ColorSensor colorSensor;
-
-    // Subsystems
-    public MecanumDrive drivetrain;
 
     public TelemetryManager telemetryManager;
 
@@ -67,21 +71,35 @@ public class RobotHardware {
         rightFront = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.rightFront);
 
         leftFront.setDirection(DcMotorEx.Direction.REVERSE); // MAYBE CHANGE
+//        rightRear.setDirection(DcMotorEx.Direction.REVERSE); // MAYBE CHANGE
         leftRear.setDirection(DcMotorEx.Direction.REVERSE); // MAYBE CHANGE
+//        rightFront.setDirection(DcMotorEx.Direction.REVERSE); // MAYBE CHANGE
 
         imu = hardwareMap.get(IMU.class, "imu");
+//        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+//                RevHubOrientationOnRobot.LogoFacingDirection.UP, //
+//                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT
+//        ));
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.LEFT, //
-                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
+                RevHubOrientationOnRobot.LogoFacingDirection.UP, //
+                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT
         ));
         imu.initialize(parameters);
         imu.resetYaw();
 
+        // ******************* INTAKE ******************* //
+        intakeMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Intake.intake);
+
+        // ******************* OUTTAKE ******************* //
+        outtakeMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Outtake.outtake);
+        outtakeMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        feederMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Outtake.feeder);
+
         // ******************* LIMELIGHT ******************* //
-        limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.setPollRateHz(100);
-        limelight.pipelineSwitch(0);
-        limelight.start();
+//        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+//        limelight.setPollRateHz(100);
+//        limelight.pipelineSwitch(0);
+//        limelight.start();
 
         // ******************* COLOR SENSOR ******************* //
 //        colorSensor = hardwareMap.get(ColorSensor.class, "colorSensor");

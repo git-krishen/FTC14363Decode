@@ -1,24 +1,35 @@
 package opmode;
 
+import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.StartEndCommand;
+import com.arcrobotics.ftclib.command.Subsystem;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import java.util.Set;
+
+import subsystems.Intake;
 import subsystems.MecanumDrive;
+import subsystems.Outtake;
+import util.RobotConstants;
 import util.RobotHardware;
 
 @TeleOp
 public class Teleop extends CommandOpMode {
     private final RobotHardware robot = RobotHardware.getInstance();
     private GamepadEx driver;
-    // Maybe I need to set states here???
     private MecanumDrive drivetrain;
+    private Intake intake;
+    private Outtake outtake;
+    // Maybe I need to set states here???
 
 
     @Override
@@ -26,9 +37,11 @@ public class Teleop extends CommandOpMode {
         CommandScheduler.getInstance().reset();
         driver = new GamepadEx(gamepad1);
         robot.init(hardwareMap, driver);
-        // Would add telemetry here
 
         drivetrain = new MecanumDrive();
+        intake = new Intake();
+        outtake = new Outtake();
+        // Would add telemetry here
     }
 
     @Override
@@ -50,38 +63,78 @@ public class Teleop extends CommandOpMode {
                 new InstantCommand(() -> robot.imu.resetYaw())
         );
 
-//        driver.getGamepadButton(GamepadKeys.Button.B).whileHeld(
-//                new StartEndCommand(
-//                        () -> drivetrain.setSlowMode(true),
-//                        () -> drivetrain.setSlowMode(false)
-//                )
-//        );
+        driver.getGamepadButton(GamepadKeys.Button.START).whenPressed(
+                new StartEndCommand(
+                        () -> {
+                            outtake.setFeederPower(-0.7);
+                            intake.setIntakePower(-0.7);
+                        },
+                        () -> {
+                            outtake.stopFeederMotor();
+                            intake.stopMotor();
+                        },
+                        outtake, intake
+                )
+        );
+
         driver.getGamepadButton(GamepadKeys.Button.B).whenPressed(
                 new InstantCommand(() -> drivetrain.setSlowMode(!drivetrain.getSlowMode()))
         );
 
-        //        driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(
-//                new Command() {
-//                    DoubleSupplier result;
-//
-//                    @Override
-//                    public void initialize() {
-//                        result = robot.drivetrain.driveToPose(
-//                                new Pose(1,1,1),
-//                                hardwareMap
-//                        );
-//                    }
-//
-//                    @Override
-//                    public boolean isFinished() {
-//                        return result.getAsDouble() == 1.0;
-//                    }
-//
-//                    @Override
-//                    public Set<Subsystem> getRequirements() {
-//                        return Set.of(robot.drivetrain);
-//                    }
-//                }, true
-//        );
+        ConditionalCommand triggerCommand = new ConditionalCommand(
+                new InstantCommand(() -> intake.setIntakeMotorVelocity(RobotConstants.Intake.intakeVelocity)),
+                new InstantCommand(() -> intake.stopMotor()),
+                () -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.3
+        );
+        CommandScheduler.getInstance().schedule(triggerCommand);
+
+        driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whileHeld(
+                new StartEndCommand(
+                        () -> outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity),
+                        () -> outtake.stopFeederMotor()
+                )
+        );
+
+        driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whileHeld(
+                new StartEndCommand(
+                        () -> outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocity),
+                        () -> outtake.stopOuttakeMotor()
+                )
+        );
+
+        driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(
+                new Command() {
+                    Follower follower;
+
+                    @Override
+                    public void initialize() {
+                        follower = drivetrain.driveToPose(
+                                new Pose(72,24,90),
+                                hardwareMap
+                        );
+                    }
+
+                    @Override
+                    public void execute() {
+                        follower.update();
+                        System.out.println(follower.getPathCompletion());
+                    }
+
+                    @Override
+                    public boolean isFinished() {
+                        return follower.isBusy();
+                    }
+
+                    @Override
+                    public void end(boolean interrupted) {
+                        follower.pausePathFollowing();
+                    }
+
+                    @Override
+                    public Set<Subsystem> getRequirements() {
+                        return Set.of(drivetrain);
+                    }
+                }, false
+        );
     }
 }
