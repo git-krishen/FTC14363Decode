@@ -30,6 +30,6 @@ public class Intake implements Subsystem {
     }
 
     public void stopMotor() {
-        robot.intakeMotor.setVelocity(0);
+        robot.intakeMotor.setPower(0);
     }
 }

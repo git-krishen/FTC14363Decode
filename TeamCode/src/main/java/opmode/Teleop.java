@@ -14,6 +14,7 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import java.util.Collections;
 import java.util.Set;
 
 import subsystems.Intake;
@@ -63,12 +64,34 @@ public class Teleop extends CommandOpMode {
                 new InstantCommand(() -> robot.imu.resetYaw())
         );
 
-        driver.getGamepadButton(GamepadKeys.Button.START).whenPressed(
-                new StartEndCommand(
+        driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(
+                new InstantCommand(
                         () -> {
-                            outtake.setFeederPower(-0.7);
-                            intake.setIntakePower(-0.7);
+                            outtake.setOuttakePower(-0.5);
                         },
+                        outtake
+                )
+        );
+        driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenReleased(
+                new InstantCommand(
+                        () -> {
+                            outtake.stopOuttakeMotor();
+                        },
+                        outtake
+                )
+        );
+
+        driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(
+                new InstantCommand(
+                        () -> {
+                            outtake.setFeederPower(-1);
+                            intake.setIntakePower(-0.5);
+                        },
+                        outtake, intake
+                )
+        );
+        driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenReleased(
+                new InstantCommand(
                         () -> {
                             outtake.stopFeederMotor();
                             intake.stopMotor();
@@ -77,64 +100,93 @@ public class Teleop extends CommandOpMode {
                 )
         );
 
-        driver.getGamepadButton(GamepadKeys.Button.B).whenPressed(
-                new InstantCommand(() -> drivetrain.setSlowMode(!drivetrain.getSlowMode()))
+        ConditionalCommand slowModeCommand = new ConditionalCommand(
+                new InstantCommand(() -> drivetrain.setSlowMode(true)),
+                new InstantCommand(() -> drivetrain.setSlowMode(false)),
+                () -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.3
         );
+        if (!slowModeCommand.isScheduled()) {
+            CommandScheduler.getInstance().schedule(slowModeCommand);
+        }
 
-        ConditionalCommand triggerCommand = new ConditionalCommand(
-                new InstantCommand(() -> intake.setIntakeMotorVelocity(RobotConstants.Intake.intakeVelocity)),
-                new InstantCommand(() -> intake.stopMotor()),
-                () -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.3
-        );
-        CommandScheduler.getInstance().schedule(triggerCommand);
+        Command triggerCommand = new Command() {
+            boolean triggered = false;
 
-        driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whileHeld(
-                new StartEndCommand(
-                        () -> outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity),
-                        () -> outtake.stopFeederMotor()
-                )
+            @Override
+            public void execute() {
+                double triggerVal = driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
+                if (!triggered && triggerVal>0.3) {
+                    double curr = intake.getIntakePower();
+                    intake.setIntakeMotorVelocity(curr>0.1 ? 0 : RobotConstants.Intake.intakeVelocity);
+                    triggered = true;
+                } else if (triggered && triggerVal<0.3) {
+                    triggered = false;
+                }
+            }
+
+            @Override
+            public Set<Subsystem> getRequirements() {
+                return Set.of(intake);
+            }
+        };
+        if (!triggerCommand.isScheduled()) {
+            CommandScheduler.getInstance().schedule(true, triggerCommand);
+        }
+
+        driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whenHeld(
+                new InstantCommand(() -> outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity))
         );
+        driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whenReleased(
+                new InstantCommand(() -> outtake.stopFeederMotor())
+        );
+//                whenHeld(
+//                new StartEndCommand(
+//                        () -> outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity),
+//                        () -> outtake.stopFeederMotor(),
+//                        intake
+//                )
+//        );
 
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whileHeld(
-                new StartEndCommand(
-                        () -> outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocity),
-                        () -> outtake.stopOuttakeMotor()
-                )
+                new InstantCommand(() -> outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocity))
+        );
+        driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenReleased(
+                new InstantCommand(() -> outtake.stopOuttakeMotor())
         );
 
-        driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(
-                new Command() {
-                    Follower follower;
-
-                    @Override
-                    public void initialize() {
-                        follower = drivetrain.driveToPose(
-                                new Pose(72,24,90),
-                                hardwareMap
-                        );
-                    }
-
-                    @Override
-                    public void execute() {
-                        follower.update();
-                        System.out.println(follower.getPathCompletion());
-                    }
-
-                    @Override
-                    public boolean isFinished() {
-                        return follower.isBusy();
-                    }
-
-                    @Override
-                    public void end(boolean interrupted) {
-                        follower.pausePathFollowing();
-                    }
-
-                    @Override
-                    public Set<Subsystem> getRequirements() {
-                        return Set.of(drivetrain);
-                    }
-                }, false
-        );
+//        driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(
+//                new Command() {
+//                    Follower follower;
+//
+//                    @Override
+//                    public void initialize() {
+//                        follower = drivetrain.driveToPose(
+//                                new Pose(72,24,90),
+//                                hardwareMap
+//                        );
+//                    }
+//
+//                    @Override
+//                    public void execute() {
+//                        follower.update();
+//                        System.out.println(follower.getPathCompletion());
+//                    }
+//
+//                    @Override
+//                    public boolean isFinished() {
+//                        return follower.isBusy();
+//                    }
+//
+//                    @Override
+//                    public void end(boolean interrupted) {
+//                        follower.pausePathFollowing();
+//                    }
+//
+//                    @Override
+//                    public Set<Subsystem> getRequirements() {
+//                        return Set.of(drivetrain);
+//                    }
+//                }, false
+//        );
     }
 }

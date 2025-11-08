@@ -56,6 +56,13 @@ public class MecanumDrive implements Subsystem {
         return follower;
     }
 
+    public void stopAll() {
+        robot.leftFront.setPower(0);
+        robot.leftRear.setPower(0);
+        robot.rightFront.setPower(0);
+        robot.rightRear.setPower(0);
+    }
+
     public void drive(double ly, double lx, double rx) {
         robot.telemetryManager.debug(String.format("driving %f %f %f", ly, lx, rx));
         robot.telemetryManager.update();

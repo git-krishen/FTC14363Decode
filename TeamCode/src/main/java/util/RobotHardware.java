@@ -81,8 +81,8 @@ public class RobotHardware {
 //                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT
 //        ));
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.UP, //
-                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT
+                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, //
+                RevHubOrientationOnRobot.UsbFacingDirection.UP
         ));
         imu.initialize(parameters);
         imu.resetYaw();
@@ -94,6 +94,7 @@ public class RobotHardware {
         outtakeMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Outtake.outtake);
         outtakeMotor.setDirection(DcMotorEx.Direction.REVERSE);
         feederMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Outtake.feeder);
+        feederMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // ******************* LIMELIGHT ******************* //
 //        limelight = hardwareMap.get(Limelight3A.class, "limelight");

@@ -22,7 +22,7 @@ import util.RobotConstants;
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
             // TODO: Configure robot mass
-            .mass(5.5)
+            .mass(7.5)
             // TODO: Tune these (https://pedropathing.com/docs/pathing/tuning/automatic)
 //            // Max robot acceleration in 48 in (Foward/LateralZeroPowerAccelerationTuner)
             .forwardZeroPowerAcceleration(-28.55)
