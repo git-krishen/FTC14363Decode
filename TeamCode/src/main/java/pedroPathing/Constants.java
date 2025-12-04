@@ -22,11 +22,11 @@ import util.RobotConstants;
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
             // TODO: Configure robot mass
-            .mass(7.5)
+            .mass(11.34)
             // TODO: Tune these (https://pedropathing.com/docs/pathing/tuning/automatic)
 //            // Max robot acceleration in 48 in (Foward/LateralZeroPowerAccelerationTuner)
-            .forwardZeroPowerAcceleration(-28.55)
-            .lateralZeroPowerAcceleration(-33.88)
+            .forwardZeroPowerAcceleration(-30.71)
+            .lateralZeroPowerAcceleration(-48.15)
             .useSecondaryTranslationalPIDF(true)
             .useSecondaryHeadingPIDF(true)
             .useSecondaryDrivePIDF(true)
@@ -37,10 +37,10 @@ public class Constants {
             .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(1,0, 0, 0))
             .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.025,0.01, 0.0001,0.6,0.01))
             .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.02,0.01, 0.00001,0.6,0.01))
-            .centripetalScaling(0.00075);
+            .centripetalScaling(0.005);
 
     public static MecanumConstants driveConstants = new MecanumConstants()
-            .maxPower(0.7)
+            .maxPower(1)
             .rightFrontMotorName(RobotConstants.Drivetrain.rightFront)
             .rightRearMotorName(RobotConstants.Drivetrain.rightRear)
             .leftRearMotorName(RobotConstants.Drivetrain.leftRear)
@@ -52,19 +52,19 @@ public class Constants {
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             // TODO: Tune these (https://pedropathing.com/docs/pathing/tuning/automatic)
 //            // Max robot velocity in 48 inches (length can be changed in Forward/LateralVelocityTuner but larger numbers are better)
-            .xVelocity(20) // 84.44
-            .yVelocity(20); // 67.30
+            .xVelocity(60) // 81
+            .yVelocity(60); // 71
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
             // Pod offsets from center
-            .forwardPodY(2.5)
-            .strafePodX(2.5)
+            .forwardPodY(1.5)
+            .strafePodX(4.63)
             .distanceUnit(DistanceUnit.INCH)
             .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaOdometryPods.goBILDA_4_BAR_POD)
             // TODO: Tune these (https://pedropathing.com/docs/pathing/tuning/localization/two-wheel)
 //            // Encoder directions (reverse if needed)
-            .forwardEncoderDirection(EncoderDirection.REVERSED)
+            .forwardEncoderDirection(EncoderDirection.FORWARD)
             .strafeEncoderDirection(EncoderDirection.FORWARD);
 //            // Multipliers (adjust perceived to real units)
 //            .forwardTicksToInches(1.0)

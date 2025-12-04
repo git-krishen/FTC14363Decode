@@ -3,18 +3,14 @@ package opmode;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
-import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.StartEndCommand;
 import com.arcrobotics.ftclib.command.Subsystem;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import java.util.Collections;
 import java.util.Set;
 
 import subsystems.Intake;
@@ -43,11 +39,11 @@ public class Teleop extends CommandOpMode {
         intake = new Intake();
         outtake = new Outtake();
         // Would add telemetry here
+
+        configureBindings();
     }
 
-    @Override
-    public void run() {
-        CommandScheduler.getInstance().run();
+    private void configureBindings() {
         robot.telemetryManager.debug(String.format("%f %f %f", driver.getLeftY(), driver.getLeftX(), driver.getRightX()));
         drivetrain.setDefaultCommand(new RunCommand(() -> {
             double ly = Math.abs(driver.getLeftY()) > 0.15 ? driver.getLeftY() : 0;
@@ -67,7 +63,7 @@ public class Teleop extends CommandOpMode {
         driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(
                 new InstantCommand(
                         () -> {
-                            outtake.setOuttakePower(-0.5);
+                            outtake.setOuttakePower(-1);
                         },
                         outtake
                 )
@@ -100,14 +96,10 @@ public class Teleop extends CommandOpMode {
                 )
         );
 
-        ConditionalCommand slowModeCommand = new ConditionalCommand(
-                new InstantCommand(() -> drivetrain.setSlowMode(true)),
-                new InstantCommand(() -> drivetrain.setSlowMode(false)),
-                () -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.3
-        );
-        if (!slowModeCommand.isScheduled()) {
-            CommandScheduler.getInstance().schedule(slowModeCommand);
-        }
+        RunCommand slowModeCommand = new RunCommand(() -> {
+            drivetrain.setSlowMode(driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.3);
+        });
+        CommandScheduler.getInstance().schedule(false, slowModeCommand);
 
         Command triggerCommand = new Command() {
             boolean triggered = false;
@@ -125,33 +117,33 @@ public class Teleop extends CommandOpMode {
             }
 
             @Override
+            public void end(boolean interrupted) {
+                intake.stopMotor();
+            }
+
+            @Override
             public Set<Subsystem> getRequirements() {
                 return Set.of(intake);
             }
         };
-        if (!triggerCommand.isScheduled()) {
-            CommandScheduler.getInstance().schedule(true, triggerCommand);
-        }
+        intake.setDefaultCommand(triggerCommand);
 
         driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whenHeld(
                 new InstantCommand(() -> outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity))
         );
-        driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whenReleased(
-                new InstantCommand(() -> outtake.stopFeederMotor())
+        driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whenHeld(
+                new StartEndCommand(
+                        () -> outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity),
+                        () -> outtake.stopFeederMotor(),
+                        intake
+                )
         );
-//                whenHeld(
-//                new StartEndCommand(
-//                        () -> outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity),
-//                        () -> outtake.stopFeederMotor(),
-//                        intake
-//                )
-//        );
 
-        driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whileHeld(
-                new InstantCommand(() -> outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocity))
-        );
-        driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenReleased(
-                new InstantCommand(() -> outtake.stopOuttakeMotor())
+        driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenHeld(
+                new StartEndCommand(
+                        () -> outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityShort),
+                        () -> outtake.stopOuttakeMotor()
+                )
         );
 
 //        driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(

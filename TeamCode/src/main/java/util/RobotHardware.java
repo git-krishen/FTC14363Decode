@@ -17,6 +17,8 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+
 import subsystems.MecanumDrive;
 
 public class RobotHardware {
@@ -40,6 +42,9 @@ public class RobotHardware {
 
     // Limelight
     public Limelight3A limelight;
+
+    // Camera
+    public WebcamName webcam;
 
     // Color Sensor
 //    public ColorSensor colorSensor;
@@ -70,6 +75,11 @@ public class RobotHardware {
         rightRear = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.rightRear);
         rightFront = hardwareMap.get(DcMotorEx.class, RobotConstants.Drivetrain.rightFront);
 
+        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         leftFront.setDirection(DcMotorEx.Direction.REVERSE); // MAYBE CHANGE
 //        rightRear.setDirection(DcMotorEx.Direction.REVERSE); // MAYBE CHANGE
         leftRear.setDirection(DcMotorEx.Direction.REVERSE); // MAYBE CHANGE
@@ -93,6 +103,8 @@ public class RobotHardware {
         // ******************* OUTTAKE ******************* //
         outtakeMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Outtake.outtake);
         outtakeMotor.setDirection(DcMotorEx.Direction.REVERSE);
+//        outtakeMotor.setPIDFCoefficients();
+        outtakeMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         feederMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Outtake.feeder);
         feederMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
@@ -101,6 +113,9 @@ public class RobotHardware {
 //        limelight.setPollRateHz(100);
 //        limelight.pipelineSwitch(0);
 //        limelight.start();
+
+        // ******************* CAMERA ******************* //
+//        WebcamName webcam = hardwareMap.get(WebcamName.class, "webcam1");
 
         // ******************* COLOR SENSOR ******************* //
 //        colorSensor = hardwareMap.get(ColorSensor.class, "colorSensor");

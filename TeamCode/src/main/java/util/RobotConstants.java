@@ -17,6 +17,8 @@ public class RobotConstants {
         public static String outtake = "outtakeMotor";
         public static String feeder = "feederMotor";
         public static double feederVelocity = Math.PI*2;
-        public static double outtakeVelocity = Math.PI*1;
+        //The only one that actually does anything (degree ticks per second)
+        public static double outtakeVelocityShort = Math.PI*1.5; // (500/60.0)*28;
+        public static double outtakeVelocityLong = Math.PI*1.75;
     }
 }
