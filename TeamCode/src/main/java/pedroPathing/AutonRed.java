@@ -26,9 +26,9 @@ public class AutonRed extends OpMode {
     // Poses
     private final Pose startPoseBottom = new Pose(87, 8.5, Math.toRadians(270));
     private final Pose startPoseTop = new Pose(120,120, Math.toRadians(315));
-    private final Pose row1Control = new Pose(94, 48-18-20, Math.toRadians(30));
-    private final Pose row1Start = new Pose(108-18, 36+8-20, Math.toRadians(0));
-    private final Pose row1End = new Pose(132-20, 36+8-20, Math.toRadians(0));
+    private final Pose row1Control = new Pose(94, 10, Math.toRadians(30));
+    private final Pose row1Start = new Pose(90, 24, Math.toRadians(0));
+    private final Pose row1End = new Pose(116, 24, Math.toRadians(0));
 //    private final Pose row2Control = new Pose(72-8, 72-24, Math.toRadians(30));
 //    private final Pose row2Start = new Pose(108-18, 60+8, Math.toRadians(0));
 //    private final Pose row2End = new Pose(132-14, 60+8, Math.toRadians(0));
