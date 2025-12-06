@@ -7,10 +7,12 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
+import java.util.Arrays;
 import java.util.function.DoubleSupplier;
 
 import pedroPathing.Constants;
@@ -65,6 +67,7 @@ public class MecanumDrive implements Subsystem {
 
     public void drive(double ly, double lx, double rx) {
         robot.telemetryManager.debug(String.format("driving %f %f %f", ly, lx, rx));
+        robot.telemetryManager.debug("Pinpoint " + Arrays.toString(GoBildaPinpointDriver.DeviceStatus.values()));
         robot.telemetryManager.update();
 
         heading = robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);

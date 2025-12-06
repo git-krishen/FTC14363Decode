@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import com.arcrobotics.ftclib.controller.PIDFController;
@@ -105,6 +106,8 @@ public class RobotHardware {
         outtakeMotor.setDirection(DcMotorEx.Direction.REVERSE);
 //        outtakeMotor.setPIDFCoefficients();
         outtakeMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        outtakeMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(200,0,0,0));
+        outtakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         feederMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Outtake.feeder);
         feederMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 

@@ -57,7 +57,10 @@ public class Teleop extends CommandOpMode {
         }, drivetrain));
 
         driver.getGamepadButton(GamepadKeys.Button.START).whenPressed(
-                new InstantCommand(() -> robot.imu.resetYaw())
+                new InstantCommand(() -> {
+                    robot.imu.resetYaw();
+
+                })
         );
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(
@@ -140,10 +143,26 @@ public class Teleop extends CommandOpMode {
         );
 
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenHeld(
-                new StartEndCommand(
-                        () -> outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityShort),
-                        () -> outtake.stopOuttakeMotor()
-                )
+                new Command() {
+                    @Override
+                    public void execute() {
+                        if (driver.getGamepadButton(GamepadKeys.Button.A).get()) {
+                            outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityLong);
+                        } else {
+                            outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityShort);
+                        }
+                    }
+
+                    @Override
+                    public void end(boolean interrupted) {
+                        outtake.stopOuttakeMotor();
+                    }
+
+                    @Override
+                    public Set<Subsystem> getRequirements() {
+                        return Set.of(outtake);
+                    }
+                }
         );
 
 //        driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(
