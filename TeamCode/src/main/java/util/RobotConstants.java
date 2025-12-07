@@ -19,6 +19,6 @@ public class RobotConstants {
         public static double feederVelocity = Math.PI*2;
         //The only one that actually does anything (degree ticks per second)
         public static double outtakeVelocityShort = Math.PI*1.2; // (500/60.0)*28;
-        public static double outtakeVelocityLong = Math.PI*1.5;
+        public static double outtakeVelocityLong = Math.PI*1.6;
     }
 }

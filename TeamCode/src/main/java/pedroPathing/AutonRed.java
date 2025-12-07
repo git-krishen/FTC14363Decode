@@ -168,7 +168,7 @@ public class AutonRed extends OpMode {
                 break;
             case 4:
                 if (follower.isBusy()) {
-                    outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityLong);
+                    outtake.setOuttakeVelocity(Math.PI*1.7);
                 }
                 if (pathTimer.getElapsedTime() < 2500) {
 

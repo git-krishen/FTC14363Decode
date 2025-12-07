@@ -17,8 +17,8 @@ import subsystems.Outtake;
 import util.RobotConstants;
 import util.RobotHardware;
 
-@Autonomous(name = "AutonBlue", group = "Test")
-public class AutonBlue extends OpMode {
+@Autonomous(name = "JustLeave", group = "Test")
+public class JustLeave extends OpMode {
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
@@ -108,99 +108,10 @@ public class AutonBlue extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
-                if (!follower.isBusy() && pathTimer.getElapsedTime() < 250) {
-                    follower.followPath(score, true);
-                    outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityLong);
-//                    outtake.setOuttakePower(1);
-                }
-                if (pathTimer.getElapsedTime() < 2500) {
-
-                } else if (pathTimer.getElapsedTime() < 2750) {
-                    outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
-                } else if (pathTimer.getElapsedTime() < 4750) {
-                    outtake.stopFeederMotor();
-                } else if (pathTimer.getElapsedTime() < 5000) {
-                    outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
-                    intake.setIntakeMotorVelocity(RobotConstants.Intake.intakeVelocity);
-                } else if (pathTimer.getElapsedTime() < 7000) {
-                    intake.stopMotor();
-                    outtake.stopFeederMotor();
-                } else if (pathTimer.getElapsedTime() < 7500) {
-                    outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
-                    intake.setIntakeMotorVelocity(RobotConstants.Intake.intakeVelocity);
-                } else {
-                    outtake.stopOuttakeMotor();
-                    outtake.stopFeederMotor();
-                    intake.stopMotor();
-                    setPathState(1);
-                }
+                follower.followPath(row1);
+                setPathState(1);
                 break;
             case 1:
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
-                if(!follower.isBusy()) {
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(row1);
-                    setPathState(2);
-                }
-                break;
-            case 2:
-                if(!follower.isBusy()) {
-                    follower.followPath(pickup1);
-                    setPathState(3);
-                }
-                break;
-            case 3:
-                if (pathTimer.getElapsedTime() < 500) {
-                    intake.setIntakePower(1);
-                    outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
-                } else if (pathTimer.getElapsedTime() < 700) {
-                    outtake.setFeederVelocity(-RobotConstants.Outtake.feederVelocity);
-                } else if (follower.getPathCompletion() < 1) {
-                    outtake.stopFeederMotor();
-                } else {
-                    intake.stopMotor();
-                }
-                if(!follower.isBusy()) {
-                    intake.stopMotor();
-                    follower.followPath(score2, true);
-                    setPathState(4);
-                }
-                break;
-            case 4:
-                if (follower.isBusy()) {
-                    outtake.setOuttakeVelocity(Math.PI*1.7);
-                }
-                if (pathTimer.getElapsedTime() < 200) {
-                    outtake.setFeederVelocity(-RobotConstants.Outtake.feederVelocity);
-                } else if (pathTimer.getElapsedTime() < 2500+500) {
-                    outtake.stopFeederMotor();
-                } else if (pathTimer.getElapsedTime() < 2750+500) {
-                    outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
-                } else if (pathTimer.getElapsedTime() < 4750+750) {
-                    outtake.stopFeederMotor();
-                } else if (pathTimer.getElapsedTime() < 5000+750) {
-                    outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
-                    intake.setIntakeMotorVelocity(RobotConstants.Intake.intakeVelocity);
-                } else if (pathTimer.getElapsedTime() < 7000+750) {
-                    intake.stopMotor();
-                    outtake.stopFeederMotor();
-                } else if (pathTimer.getElapsedTime() < 7500+750) {
-                    outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
-                    intake.setIntakeMotorVelocity(RobotConstants.Intake.intakeVelocity);
-                } else {
-                    outtake.stopOuttakeMotor();
-                    outtake.stopFeederMotor();
-                    intake.stopMotor();
-                    setPathState(5);
-                }
-                break;
-            case 5:
-                if(!follower.isBusy()) {
-                    follower.followPath(row1);
-                    setPathState(6);
-                }
-                break;
-            case 6:
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
                     /* Set the state to a Case we won't use or define, so it just stops running an new paths */
