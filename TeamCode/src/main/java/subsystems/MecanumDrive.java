@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.function.DoubleSupplier;
 
 import pedroPathing.Constants;
+import util.HeadingPID;
 import util.RobotHardware;
 
 public class MecanumDrive implements Subsystem {
@@ -24,10 +25,12 @@ public class MecanumDrive implements Subsystem {
     private boolean slowmode;
 
     private Pose pose;
+    private HeadingPID pid;
 
     public MecanumDrive() {
         this.robot = RobotHardware.getInstance();
         this.pose = new Pose();
+        pid = new HeadingPID(0.5,0,0.01,10,10);
     }
 
     public Pose getCurrentPose() {
@@ -67,14 +70,21 @@ public class MecanumDrive implements Subsystem {
 
     public void drive(double ly, double lx, double rx) {
         robot.telemetryManager.debug(String.format("driving %f %f %f", ly, lx, rx));
-        robot.telemetryManager.debug("Pinpoint " + Arrays.toString(GoBildaPinpointDriver.DeviceStatus.values()));
+        robot.telemetryManager.debug("tx: " + Limelight.getTargetX().orElse(0) + " | diff: " + (robot.imu.getRobotYawPitchRollAngles().getYaw()-Limelight.getTargetX().orElse(0)));
         robot.telemetryManager.update();
+        Limelight.setTargetID(20);
 
         heading = robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
         double rotX = lx * Math.cos(-heading) - ly * Math.sin(-heading);
         double rotY = lx * Math.sin(-heading) + ly * Math.cos(-heading);
 
         rotX *= 1.1;
+
+//        if (rx == 0 && (Limelight.hasTag(20))) {
+//            rx = Math.clamp(pid.calculate(Math.toRadians(robot.imu.getRobotYawPitchRollAngles().getYaw()), Math.toRadians(robot.imu.getRobotYawPitchRollAngles().getYaw()-Limelight.getTargetX().orElse(
+//                    0
+//            ))), -1, 1);
+//        }
 
         double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
         leftFrontPower = (rotY + rotX + rx) / denominator;

@@ -59,7 +59,6 @@ public class Teleop extends CommandOpMode {
         driver.getGamepadButton(GamepadKeys.Button.START).whenPressed(
                 new InstantCommand(() -> {
                     robot.imu.resetYaw();
-
                 })
         );
 

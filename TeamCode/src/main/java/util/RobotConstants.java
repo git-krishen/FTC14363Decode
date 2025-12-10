@@ -21,4 +21,9 @@ public class RobotConstants {
         public static double outtakeVelocityShort = Math.PI*1.2; // (500/60.0)*28;
         public static double outtakeVelocityLong = Math.PI*1.6;
     }
+
+    public static class Turret {
+        public static double maxServoPos = Math.PI;
+        public static double minServoPos = 0;
+    }
 }

@@ -4,6 +4,7 @@ import com.arcrobotics.ftclib.controller.PIDController;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -40,6 +41,9 @@ public class RobotHardware {
     public DcMotorEx feederMotor;
 
     public GamepadEx driver;
+
+    // Turret
+    public Servo turretServo;
 
     // Limelight
     public Limelight3A limelight;
@@ -95,6 +99,7 @@ public class RobotHardware {
                 RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, //
                 RevHubOrientationOnRobot.UsbFacingDirection.UP
         ));
+
         imu.initialize(parameters);
         imu.resetYaw();
 
@@ -111,11 +116,15 @@ public class RobotHardware {
         feederMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Outtake.feeder);
         feederMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        // ******************* TURRET ******************* //
+//        turretServo = hardwareMap.get(Servo.class, "turretServo");
+//        turretServo.resetDeviceConfigurationForOpMode();
+
         // ******************* LIMELIGHT ******************* //
-//        limelight = hardwareMap.get(Limelight3A.class, "limelight");
-//        limelight.setPollRateHz(100);
-//        limelight.pipelineSwitch(0);
-//        limelight.start();
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.setPollRateHz(100);
+        limelight.pipelineSwitch(9);
+        limelight.start();
 
         // ******************* CAMERA ******************* //
 //        WebcamName webcam = hardwareMap.get(WebcamName.class, "webcam1");

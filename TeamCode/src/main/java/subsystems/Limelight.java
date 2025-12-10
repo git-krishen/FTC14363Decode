@@ -20,7 +20,7 @@ public class Limelight implements Subsystem {
     private static RobotHardware robot;
     private static OptionalInt targetID;
 
-    public Limelight() {
+    static {
         robot = RobotHardware.getInstance();
         targetID = OptionalInt.empty();
     }
@@ -35,6 +35,10 @@ public class Limelight implements Subsystem {
 
     public static boolean hasTarget() {
         return getTagIDList().contains(targetID);
+    }
+
+    public static boolean hasTag(int id) {
+        return getTagIDList().contains(id);
     }
 
     public static OptionalDouble getTargetX() {
