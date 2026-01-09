@@ -53,7 +53,8 @@ public class Constants {
             // TODO: Tune these (https://pedropathing.com/docs/pathing/tuning/automatic)
 //            // Max robot velocity in 48 inches (length can be changed in Forward/LateralVelocityTuner but larger numbers are better)
             .xVelocity(60) // 81
-            .yVelocity(60); // 71
+            .yVelocity(60)
+            .useBrakeModeInTeleOp(true); // 71
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
             // Pod offsets from center

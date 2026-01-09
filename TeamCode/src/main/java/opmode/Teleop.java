@@ -10,12 +10,16 @@ import com.arcrobotics.ftclib.command.Subsystem;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import java.util.Set;
 
 import subsystems.Intake;
 import subsystems.MecanumDrive;
 import subsystems.Outtake;
+import subsystems.Turret;
 import util.RobotConstants;
 import util.RobotHardware;
 
@@ -26,6 +30,7 @@ public class Teleop extends CommandOpMode {
     private MecanumDrive drivetrain;
     private Intake intake;
     private Outtake outtake;
+    private Turret turret;
     // Maybe I need to set states here???
 
 
@@ -38,13 +43,21 @@ public class Teleop extends CommandOpMode {
         drivetrain = new MecanumDrive();
         intake = new Intake();
         outtake = new Outtake();
+        turret = new Turret();
         // Would add telemetry here
 
         configureBindings();
     }
 
+    @Override
+    public void run() {
+        CommandScheduler.getInstance().run();
+        robot.follower.update();
+    }
+
     private void configureBindings() {
         robot.telemetryManager.debug(String.format("%f %f %f", driver.getLeftY(), driver.getLeftX(), driver.getRightX()));
+        robot.telemetryManager.addData("Turret", turret.getPositionProportion());
         drivetrain.setDefaultCommand(new RunCommand(() -> {
             double ly = Math.abs(driver.getLeftY()) > 0.15 ? driver.getLeftY() : 0;
             double lx = Math.abs(driver.getLeftX()) > 0.15 ? driver.getLeftX() : 0;
@@ -58,8 +71,32 @@ public class Teleop extends CommandOpMode {
 
         driver.getGamepadButton(GamepadKeys.Button.START).whenPressed(
                 new InstantCommand(() -> {
-                    robot.imu.resetYaw();
+                    robot.follower.setPose(robot.follower.getPose().setHeading(0));
                 })
+        );
+
+//        driver.getGamepadButton(GamepadKeys.Button.LEFT_STICK_BUTTON).whenPressed(
+//                new InstantCommand(() -> {
+//                    robot.odo.recalibrateIMU();
+//                })
+//        );driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whileHeld(
+//                new InstantCommand(() -> turret.setPosition(turret.getPosition()+0.01))
+//        );
+
+//        turret.setDefaultCommand(new RunCommand(() -> turret.lockToAprilTag(), turret));
+        driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whileHeld(
+                new StartEndCommand(
+                        () -> turret.setPower(0.75),
+                        () -> turret.stopTurret(),
+                        turret
+                )
+        );
+        driver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).whileHeld(
+                new StartEndCommand(
+                        () -> turret.setPower(-0.75),
+                        () -> turret.stopTurret(),
+                        turret
+                )
         );
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(
@@ -131,13 +168,9 @@ public class Teleop extends CommandOpMode {
         intake.setDefaultCommand(triggerCommand);
 
         driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whenHeld(
-                new InstantCommand(() -> outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity))
-        );
-        driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whenHeld(
                 new StartEndCommand(
-                        () -> outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity),
-                        () -> outtake.stopFeederMotor(),
-                        intake
+                        () -> outtake.setFeederPower(1),
+                        () -> outtake.stopFeederMotor()
                 )
         );
 

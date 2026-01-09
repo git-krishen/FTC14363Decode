@@ -19,27 +19,23 @@ import util.RobotHardware;
 
 @Autonomous(name = "AutonRed", group = "Test")
 public class AutonRed extends OpMode {
+    RobotHardware robot;
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
 
     // Poses
-    private final Pose startPoseBottom = new Pose(87, 8.5, Math.toRadians(270));
-    private final Pose startPoseTop = new Pose(120,120, Math.toRadians(315));
+    private final Pose startPose = new Pose(87, 8.5, Math.toRadians(270));
     private final Pose row1Control = new Pose(94, 10, Math.toRadians(30));
     private final Pose row1Start = new Pose(90, 24, Math.toRadians(0));
-    private final Pose row1End = new Pose(116, 24, Math.toRadians(0));
-//    private final Pose row2Control = new Pose(72-8, 72-24, Math.toRadians(30));
-//    private final Pose row2Start = new Pose(108-18, 60+8, Math.toRadians(0));
-//    private final Pose row2End = new Pose(132-14, 60+8, Math.toRadians(0));
-    private final Pose row2Control = new Pose(72-8, 48-24, Math.toRadians(30));
-    private final Pose row2Start = new Pose(108-18, 36+8, Math.toRadians(0));
-    private final Pose row2End = new Pose(132-16, 36+8, Math.toRadians(0));
-    private final Pose row3Control = new Pose(72-8, 96-24, Math.toRadians(30));
-    private final Pose row3Start = new Pose(108-18, 84+8, Math.toRadians(0));
-    private final Pose row3End = new Pose(132-24, 84+8, Math.toRadians(0));
-    private final Pose scorePoseTop = new Pose(84, 60, Math.toRadians(135));
-    private final Pose scorePoseBottom = new Pose(90, 12, Math.toRadians(245)); //y=18 // 240
+    private final Pose row1End = new Pose(120, 24, Math.toRadians(0));
+    private final Pose row2Control = new Pose(76, 10+22, Math.toRadians(30));
+    private final Pose row2Start = new Pose(90, 24+24, Math.toRadians(0));
+    private final Pose row2End = new Pose(120, 24+22, Math.toRadians(0));
+    private final Pose row3Control = new Pose(86, 10+48, Math.toRadians(30));
+    private final Pose row3Start = new Pose(90, 24+48, Math.toRadians(0));
+    private final Pose row3End = new Pose(112, 24+48, Math.toRadians(0));
+    private final Pose scorePose = new Pose(90, 12, Math.toRadians(245)); //y=18 // 240
 
     // Paths
     private PathChain row1, row2, row3, pickup1, pickup2, pickup3, score, score1, score2, score3;
@@ -48,61 +44,18 @@ public class AutonRed extends OpMode {
     private Outtake outtake;
 
     public void buildPaths() {
-        score = follower.pathBuilder()
-                .addPath(new BezierLine(startPoseBottom, scorePoseBottom))
-                .setLinearHeadingInterpolation(startPoseBottom.getHeading(), scorePoseBottom.getHeading())
-//                .setVelocityConstraint(5)
-                .build();
-        row3 = follower.pathBuilder()
-                .addPath(new BezierCurve(new ArrayList<>(List.of(scorePoseBottom, row3Control, row3Start))))
-                .setLinearHeadingInterpolation(scorePoseBottom.getHeading(), row3Start.getHeading())
-                .build();
-        pickup3 = follower.pathBuilder()
-                .addPath(new BezierLine(row3Start, row3End))
-                .setLinearHeadingInterpolation(row3Start.getHeading(), row3End.getHeading())
-                .setVelocityConstraint(20)
-                .addPath(new BezierLine(row3End, row3Start))
-                .setLinearHeadingInterpolation(row3End.getHeading(), row3Start.getHeading())
-                .setVelocityConstraint(20)
-                .build();
-        score3 = follower.pathBuilder()
-                .addPath(new BezierCurve(new ArrayList<>(List.of(row3Start, row3Control, scorePoseBottom))))
-                .setLinearHeadingInterpolation(row3Start.getHeading(), scorePoseBottom.getHeading())
-                .build();
+        score = createLine(startPose, scorePose);
+        row3 = createCurve(scorePose, row3Control, row3Start);
+        pickup3 = createPickupPath(row3Start, row3End, 20);
+        score3 = createCurve(row3Start, row3Control, row3End);
 
-        row2 = follower.pathBuilder()
-                .addPath(new BezierCurve(new ArrayList<>(List.of(scorePoseBottom, row2Control, row2Start))))
-                .setLinearHeadingInterpolation(scorePoseBottom.getHeading(), row2Start.getHeading())
-                .build();
-        pickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(row2Start, row2End))
-                .setLinearHeadingInterpolation(row2Start.getHeading(), row2End.getHeading())
-                .setVelocityConstraint(20)
-                .addPath(new BezierLine(row2End, row2Start))
-                .setLinearHeadingInterpolation(row2End.getHeading(), row2Start.getHeading())
-                .setVelocityConstraint(20)
-                .build();
-        score2 = follower.pathBuilder()
-                .addPath(new BezierCurve(new ArrayList<>(List.of(row2Start, row2Control, scorePoseBottom))))
-                .setLinearHeadingInterpolation(row2Start.getHeading(), scorePoseBottom.getHeading())
-                .build();
+        row2 = createCurve(scorePose, row2Control, row2Start);
+        pickup2 = createPickupPath(row2Start, row2End, 20);
+        score2 = createCurve(row2Start, row2Control, scorePose);
 
-        row1 = follower.pathBuilder()
-                .addPath(new BezierCurve(new ArrayList<>(List.of(scorePoseBottom, row1Control, row1Start))))
-                .setLinearHeadingInterpolation(scorePoseBottom.getHeading(), row1Start.getHeading())
-                .build();
-        pickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(row1Start, row1End))
-                .setLinearHeadingInterpolation(row1Start.getHeading(), row1End.getHeading())
-                .setVelocityConstraint(20)
-                .addPath(new BezierLine(row1End, row1Start))
-                .setLinearHeadingInterpolation(row1End.getHeading(), row1Start.getHeading())
-                .setVelocityConstraint(20)
-                .build();
-        score1 = follower.pathBuilder()
-                .addPath(new BezierCurve(new ArrayList<>(List.of(row1Start, row1Control, scorePoseBottom))))
-                .setLinearHeadingInterpolation(row1Start.getHeading(), scorePoseBottom.getHeading())
-                .build();
+        row1 = createCurve(scorePose, row1Control, row1Start);
+        pickup1 = createPickupPath(row1Start, row1End, 20);
+        score1 = createCurve(row1Start, row1Control, scorePose);
     }
 
     public void autonomousPathUpdate() {
@@ -111,29 +64,15 @@ public class AutonRed extends OpMode {
                 if (!follower.isBusy() && pathTimer.getElapsedTime() < 250) {
                     follower.followPath(score, true);
                     outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityLong);
-//                    outtake.setOuttakePower(1);
                 }
-                if (pathTimer.getElapsedTime() < 2500) {
-
-                } else if (pathTimer.getElapsedTime() < 2750) {
-                    outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
-                } else if (pathTimer.getElapsedTime() < 4750) {
-                    outtake.stopFeederMotor();
-                } else if (pathTimer.getElapsedTime() < 5000) {
-                    outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
-                    intake.setIntakeMotorVelocity(RobotConstants.Intake.intakeVelocity);
-                } else if (pathTimer.getElapsedTime() < 7000) {
-                    intake.stopMotor();
-                    outtake.stopFeederMotor();
-                } else if (pathTimer.getElapsedTime() < 7500) {
-                    outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
-                    intake.setIntakeMotorVelocity(RobotConstants.Intake.intakeVelocity);
-                } else {
-                    outtake.stopOuttakeMotor();
-                    outtake.stopFeederMotor();
-                    intake.stopMotor();
-                    setPathState(1);
-                }
+                handleShooting(
+                        2500,
+                        250,
+                        2000,
+                        250,
+                        2000,
+                        500,
+                        1);
                 break;
             case 1:
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
@@ -150,19 +89,10 @@ public class AutonRed extends OpMode {
                 }
                 break;
             case 3:
-                if (pathTimer.getElapsedTime() < 500) {
-                    intake.setIntakePower(1);
-                    outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
-                } else if (pathTimer.getElapsedTime() < 700) {
-                    outtake.setFeederVelocity(-RobotConstants.Outtake.feederVelocity);
-                } else if (follower.getPathCompletion() < 1) {
-                    outtake.stopFeederMotor();
-                } else {
-                    intake.stopMotor();
-                }
+                handleIntake(500,200);
                 if(!follower.isBusy()) {
                     intake.stopMotor();
-                    follower.followPath(score2, true);
+                    follower.followPath(score1, true);
                     setPathState(4);
                 }
                 break;
@@ -170,41 +100,168 @@ public class AutonRed extends OpMode {
                 if (follower.isBusy()) {
                     outtake.setOuttakeVelocity(Math.PI*1.7);
                 }
-                if (pathTimer.getElapsedTime() < 2500) {
-
-                } else if (pathTimer.getElapsedTime() < 2750) {
-                    outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
-                } else if (pathTimer.getElapsedTime() < 4750) {
-                    outtake.stopFeederMotor();
-                } else if (pathTimer.getElapsedTime() < 5000) {
-                    outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
-                    intake.setIntakeMotorVelocity(RobotConstants.Intake.intakeVelocity);
-                } else if (pathTimer.getElapsedTime() < 7000) {
-                    intake.stopMotor();
-                    outtake.stopFeederMotor();
-                } else if (pathTimer.getElapsedTime() < 7500) {
-                    outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
-                    intake.setIntakeMotorVelocity(RobotConstants.Intake.intakeVelocity);
-                } else {
-                    outtake.stopOuttakeMotor();
-                    outtake.stopFeederMotor();
-                    intake.stopMotor();
-                    setPathState(5);
-                }
+                handleShooting(
+                        2500,
+                        250,
+                        2000,
+                        500,
+                        2000,
+                        250,
+                        5);
                 break;
             case 5:
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
-                    follower.followPath(row1);
+                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
+                    follower.followPath(row2);
                     setPathState(6);
                 }
                 break;
             case 6:
+                if(!follower.isBusy()) {
+                    follower.followPath(pickup2);
+                    setPathState(7);
+                }
+                break;
+            case 7:
+                handleIntake(500,400);
+                if(!follower.isBusy()) {
+                    intake.stopMotor();
+                    follower.followPath(score2, true);
+                    setPathState(8);
+                }
+                break;
+            case 8:
+                if (follower.isBusy()) {
+                    outtake.setOuttakeVelocity(Math.PI*1.7);
+                }
+                handleShooting(
+                        2250,
+                        250,
+                        2000,
+                        500,
+                        2000,
+                        500,
+                        9);
+                break;
+            case 9:
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
+                if(!follower.isBusy()) {
+                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
+                    follower.followPath(row3);
+                    setPathState(10);
+                }
+                break;
+            case 10:
+                if(!follower.isBusy()) {
+                    follower.followPath(pickup3);
+                    setPathState(11);
+                }
+                break;
+            case 11:
+                handleIntake(500,200);
+                if(!follower.isBusy()) {
+                    intake.stopMotor();
+                    follower.followPath(score3, true);
+                    setPathState(12);
+                }
+                break;
+            case 12:
+                if (follower.isBusy()) {
+                    outtake.setOuttakeVelocity(Math.PI*1.7);
+                }
+                handleShooting(
+                        2500,
+                        250,
+                        2000,
+                        250,
+                        2000,
+                        500,
+                        13);
+                break;
+            case 13:
+                if(!follower.isBusy()) {
+                    follower.followPath(row1);
+                    setPathState(14);
+                }
+                break;
+            case 14:
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
                     /* Set the state to a Case we won't use or define, so it just stops running an new paths */
                     setPathState(-1);
                 }
                 break;
+        }
+    }
+
+    private PathChain createLine(Pose startPose, Pose endPose) {
+        return follower.pathBuilder()
+                .addPath(new BezierLine(startPose, endPose))
+                .setLinearHeadingInterpolation(startPose.getHeading(), endPose.getHeading())
+                .build();
+    }
+
+    private PathChain createCurve(Pose startPose, Pose controlPose, Pose endPose) {
+        return follower.pathBuilder()
+                .addPath(new BezierCurve(new ArrayList<>(List.of(startPose, controlPose, endPose))))
+                .setLinearHeadingInterpolation(startPose.getHeading(), endPose.getHeading())
+                .build();
+    }
+
+    private PathChain createPickupPath(Pose startPose, Pose endPose, int maxVel) {
+        return follower.pathBuilder()
+                .addPath(new BezierLine(startPose, endPose))
+                .setLinearHeadingInterpolation(startPose.getHeading(), endPose.getHeading())
+                .setVelocityConstraint(maxVel)
+                .addPath(new BezierLine(startPose, endPose))
+                .setLinearHeadingInterpolation(startPose.getHeading(), endPose.getHeading())
+                .setVelocityConstraint(maxVel)
+                .build();
+    }
+
+    private void handleShooting(int startDelay, int shotDelay, int shotTiming, int nextPathState) {
+        handleShooting(startDelay, shotDelay, shotDelay, shotTiming, nextPathState);
+    }
+
+    private void handleShooting(int startDelay, int shotTwoDelay, int shotThreeDelay, int shotTiming, int nextPathState) {
+        handleShooting(startDelay, shotTiming, shotTwoDelay, shotTiming, shotThreeDelay, shotTiming, nextPathState);
+    }
+
+    private void handleShooting(int startDelay, int shotOneTiming, int shotTwoDelay, int shotTwoTiming, int shotThreeDelay, int shotThreeTiming, int nextPathState) {
+        if (pathTimer.getElapsedTime() < startDelay) {
+
+        } else if (pathTimer.getElapsedTime() < startDelay+shotOneTiming) {
+            outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
+        } else if (pathTimer.getElapsedTime() < startDelay+shotOneTiming+shotTwoDelay) {
+            outtake.stopFeederMotor();
+        } else if (pathTimer.getElapsedTime() < startDelay+shotOneTiming+shotTwoDelay+shotTwoTiming) {
+            outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
+            intake.setIntakeMotorVelocity(RobotConstants.Intake.intakeVelocity);
+        } else if (pathTimer.getElapsedTime() < startDelay+shotOneTiming+shotTwoDelay+shotTwoTiming+shotThreeDelay) {
+            intake.stopMotor();
+            outtake.stopFeederMotor();
+        } else if (pathTimer.getElapsedTime() < startDelay+shotOneTiming+shotTwoDelay+shotTwoTiming+shotThreeDelay+shotThreeTiming) {
+            outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
+            intake.setIntakeMotorVelocity(RobotConstants.Intake.intakeVelocity);
+        } else {
+            outtake.stopOuttakeMotor();
+            outtake.stopFeederMotor();
+            intake.stopMotor();
+            setPathState(nextPathState);
+        }
+    }
+
+    private void handleIntake(int intakeTime, int reverseTime) {
+        if (pathTimer.getElapsedTime() < intakeTime) {
+            intake.setIntakePower(1);
+            outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
+        } else if (pathTimer.getElapsedTime() < intakeTime+reverseTime) {
+            outtake.setFeederVelocity(-RobotConstants.Outtake.feederVelocity);
+        } else if (follower.getPathCompletion() < 1) {
+            outtake.stopFeederMotor();
+        } else {
+            intake.stopMotor();
         }
     }
 
@@ -224,8 +281,8 @@ public class AutonRed extends OpMode {
 
         // Feedback to Driver Hub for debugging
         telemetry.addData("path state", pathState);
-        telemetry.addData("x", follower.getPose().getX());
-        telemetry.addData("y", follower.getPose().getY());
+        telemetry.addData("x", follower.getPose().getX() + " | " + follower.getPose().getX());
+        telemetry.addData("y", follower.getPose().getY() + " | " + follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
         telemetry.update();
 
@@ -236,15 +293,15 @@ public class AutonRed extends OpMode {
     /** This method is called once at the init of the OpMode. **/
     @Override
     public void init() {
-        RobotHardware.getInstance().init(hardwareMap);
+        robot = RobotHardware.getInstance();
+        robot.init(hardwareMap);
         pathTimer = new Timer();
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
 
 
-        follower = Constants.createFollower(hardwareMap);
+        follower = robot.follower;
         buildPaths();
-        follower.setStartingPose(startPoseBottom);
 
         intake = new Intake();
         outtake = new Outtake();
@@ -268,7 +325,14 @@ public class AutonRed extends OpMode {
 
     /** This method is called continuously after Init while waiting for "play". **/
     @Override
-    public void init_loop() {}
+    public void init_loop() {
+        follower.setStartingPose(startPose);
+        follower.setPose(startPose);
+        follower.updatePose();
+        telemetry.addData("odo", follower.getPose().getX() + " | " + follower.getPose().getY());
+        telemetry.addData("follower", follower.getPose().getX() + " | " + follower.getPose().getY());
+        telemetry.update();
+    }
 
     /** This method is called once at the start of the OpMode.
      * It runs all the setup actions, including building paths and starting the path system **/

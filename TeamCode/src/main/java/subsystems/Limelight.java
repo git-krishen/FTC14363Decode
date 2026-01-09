@@ -5,6 +5,7 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes.*;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 import java.util.ArrayList;
@@ -97,7 +98,7 @@ public class Limelight implements Subsystem {
     @Override
     public void periodic() {
 //        LLResult result = robot.limelight.getLatestResult();
-//        double robotYaw = robot.imu.getRobotYawPitchRollAngles().getYaw();
+//        double robotYaw = robot.odo.getHeading(AngleUnit.RADIANS);
 //        robot.limelight.updateRobotOrientation(robotYaw);
 //        if (result != null && result.isValid()) {
 //            Pose3D botPose = result.getBotpose_MT2();

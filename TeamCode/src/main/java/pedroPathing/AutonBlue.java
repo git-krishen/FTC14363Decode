@@ -28,16 +28,16 @@ public class AutonBlue extends OpMode {
     private final Pose startPoseTop = new Pose(120,120, Math.toRadians(295));
     private final Pose row1Control = new Pose(50, 10, Math.toRadians(210));
     private final Pose row1Start = new Pose(54, 24, Math.toRadians(180));
-    private final Pose row1End = new Pose(28, 24, Math.toRadians(180));
+    private final Pose row1End = new Pose(24, 24, Math.toRadians(180));
     //    private final Pose row2Control = new Pose(72-8, 72-24, Math.toRadians(30));
 //    private final Pose row2Start = new Pose(108-18, 60+8, Math.toRadians(0));
 //    private final Pose row2End = new Pose(132-14, 60+8, Math.toRadians(0));
-    private final Pose row2Control = new Pose(72-8, 48-24, Math.toRadians(30));
-    private final Pose row2Start = new Pose(108-18, 36+8, Math.toRadians(0));
-    private final Pose row2End = new Pose(132-16, 36+8, Math.toRadians(0));
-    private final Pose row3Control = new Pose(72-8, 96-24, Math.toRadians(30));
-    private final Pose row3Start = new Pose(108-18, 84+8, Math.toRadians(0));
-    private final Pose row3End = new Pose(132-24, 84+8, Math.toRadians(0));
+    private final Pose row2Control = new Pose(58, 10+22, Math.toRadians(210));
+    private final Pose row2Start = new Pose(54, 24+24, Math.toRadians(180));
+    private final Pose row2End = new Pose(24, 24+22, Math.toRadians(180));
+    private final Pose row3Control = new Pose(58, 10+48, Math.toRadians(210));
+    private final Pose row3Start = new Pose(54, 24+48, Math.toRadians(180));
+    private final Pose row3End = new Pose(24, 24+48, Math.toRadians(180));
     private final Pose scorePoseTop = new Pose(84, 60, Math.toRadians(135));
     private final Pose scorePoseBottom = new Pose(54, 12, Math.toRadians(295)); //y=18 // 240
 

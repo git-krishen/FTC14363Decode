@@ -1,19 +1,15 @@
 package subsystems;
 
 import com.arcrobotics.ftclib.command.Subsystem;
-import com.bylazar.telemetry.PanelsTelemetry;
-import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-
-import java.util.Arrays;
-import java.util.function.DoubleSupplier;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import pedroPathing.Constants;
 import util.HeadingPID;
@@ -51,8 +47,7 @@ public class MecanumDrive implements Subsystem {
 
     public Follower driveToPose(Pose target, HardwareMap hardwareMap) {
         Pose a = new Pose();
-        Follower follower = Constants.createFollower(hardwareMap);
-        follower.activateAllPIDFs();
+        Follower follower = robot.follower;
         PathChain path = follower.pathBuilder()
                 .addPath(new BezierLine(getCurrentPose(), target))
                 .setLinearHeadingInterpolation(getCurrentPose().getHeading(), target.getHeading())
@@ -69,19 +64,31 @@ public class MecanumDrive implements Subsystem {
     }
 
     public void drive(double ly, double lx, double rx) {
-        robot.telemetryManager.debug(String.format("driving %f %f %f", ly, lx, rx));
-        robot.telemetryManager.debug("tx: " + Limelight.getTargetX().orElse(0) + " | diff: " + (robot.imu.getRobotYawPitchRollAngles().getYaw()-Limelight.getTargetX().orElse(0)));
+        robot.telemetryManager.addData("Drive", String.format("driving %f %f %f", ly, lx, rx));
+        robot.telemetryManager.addData("Pose", "x: " + robot.follower.getPose().getX() + " | y: " + robot.follower.getPose().getY() + " | heading: " + robot.follower.getHeading());
         robot.telemetryManager.update();
         Limelight.setTargetID(20);
 
-        heading = robot.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        if (ly != 0 && lx != 0 && robot.leftRear.getZeroPowerBehavior().equals(DcMotor.ZeroPowerBehavior.BRAKE)) {
+            robot.leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            robot.leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            robot.rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            robot.rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        } else if (robot.leftFront.getZeroPowerBehavior().equals(DcMotor.ZeroPowerBehavior.FLOAT)) {
+            robot.leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            robot.leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            robot.rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            robot.rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        }
+
+        heading = robot.follower.getHeading();
         double rotX = lx * Math.cos(-heading) - ly * Math.sin(-heading);
         double rotY = lx * Math.sin(-heading) + ly * Math.cos(-heading);
 
         rotX *= 1.1;
 
 //        if (rx == 0 && (Limelight.hasTag(20))) {
-//            rx = Math.clamp(pid.calculate(Math.toRadians(robot.imu.getRobotYawPitchRollAngles().getYaw()), Math.toRadians(robot.imu.getRobotYawPitchRollAngles().getYaw()-Limelight.getTargetX().orElse(
+//            rx = Math.clamp(pid.calculate(Math.toRadians(robot.odo.getHeading(AngleUnit.RADIANS)), Math.toRadians(robot.odo.getHeading(AngleUnit.RADIANS)-Limelight.getTargetX().orElse(
 //                    0
 //            ))), -1, 1);
 //        }

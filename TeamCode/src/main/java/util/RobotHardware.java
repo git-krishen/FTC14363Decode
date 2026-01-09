@@ -1,32 +1,31 @@
 package util;
 
-import com.arcrobotics.ftclib.controller.PIDController;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.pedropathing.follower.Follower;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import com.arcrobotics.ftclib.controller.PIDFController;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
-import subsystems.MecanumDrive;
+import pedroPathing.Constants;
 
 public class RobotHardware {
     // Drivetrain
     public DcMotorEx leftFront, leftRear, rightFront, rightRear;
-    public IMU imu;
+//    public IMU imu;
+    public Follower follower;
 
     // Hardware
     private HardwareMap hardwareMap;
@@ -38,12 +37,14 @@ public class RobotHardware {
 
     // Outtake
     public DcMotorEx outtakeMotor;
+    public DcMotorEx outtakeFollower;
     public DcMotorEx feederMotor;
 
     public GamepadEx driver;
 
     // Turret
-    public Servo turretServo;
+    public CRServo turretServo;
+    public AnalogInput turretEncoder;
 
     // Limelight
     public Limelight3A limelight;
@@ -90,40 +91,51 @@ public class RobotHardware {
         leftRear.setDirection(DcMotorEx.Direction.REVERSE); // MAYBE CHANGE
 //        rightFront.setDirection(DcMotorEx.Direction.REVERSE); // MAYBE CHANGE
 
-        imu = hardwareMap.get(IMU.class, "imu");
+//        imu = hardwareMap.get(IMU.class, "imu");
+////        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+////                RevHubOrientationOnRobot.LogoFacingDirection.UP, //
+////                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT
+////        ));
 //        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-//                RevHubOrientationOnRobot.LogoFacingDirection.UP, //
-//                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT
+//                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, //
+//                RevHubOrientationOnRobot.UsbFacingDirection.UP
 //        ));
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, //
-                RevHubOrientationOnRobot.UsbFacingDirection.UP
-        ));
+//
+//        imu.initialize(parameters);
+//        imu.resetYaw();
 
-        imu.initialize(parameters);
-        imu.resetYaw();
+        follower = Constants.createFollower(hardwareMap);
+        follower.activateAllPIDFs();
 
         // ******************* INTAKE ******************* //
         intakeMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Intake.intake);
+        intakeMotor.setDirection(DcMotorEx.Direction.FORWARD);
 
         // ******************* OUTTAKE ******************* //
         outtakeMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Outtake.outtake);
         outtakeMotor.setDirection(DcMotorEx.Direction.REVERSE);
 //        outtakeMotor.setPIDFCoefficients();
         outtakeMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        outtakeMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(200,0,0,0));
+        outtakeMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(50,0,0,0));
         outtakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        outtakeFollower = hardwareMap.get(DcMotorEx.class, RobotConstants.Outtake.outtakeFollower);
+        outtakeFollower.setMode(outtakeMotor.getMode());
+        outtakeFollower.setPIDFCoefficients(outtakeMotor.getMode(), outtakeMotor.getPIDFCoefficients(outtakeMotor.getMode()));
+        outtakeFollower.setZeroPowerBehavior(outtakeMotor.getZeroPowerBehavior());
+        outtakeFollower.setDirection(outtakeMotor.getDirection().inverted());
         feederMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Outtake.feeder);
         feederMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // ******************* TURRET ******************* //
-//        turretServo = hardwareMap.get(Servo.class, "turretServo");
-//        turretServo.resetDeviceConfigurationForOpMode();
+        turretServo = hardwareMap.get(CRServo.class, "turretServo");
+        turretServo.resetDeviceConfigurationForOpMode();
+        turretEncoder = hardwareMap.get(AnalogInput.class, "turretEncoder");
 
         // ******************* LIMELIGHT ******************* //
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.setPollRateHz(100);
         limelight.pipelineSwitch(9);
+        limelight.updateRobotOrientation(0);
         limelight.start();
 
         // ******************* CAMERA ******************* //
