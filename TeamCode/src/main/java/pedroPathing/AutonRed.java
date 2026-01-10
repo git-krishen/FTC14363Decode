@@ -45,17 +45,23 @@ public class AutonRed extends OpMode {
 
     public void buildPaths() {
         score = createLine(startPose, scorePose);
-        row3 = createCurve(scorePose, row3Control, row3Start);
+//        row3 = createCurve(scorePose, row3Control, row3Start);
+        row3 = createLine(scorePose, row3Start);
         pickup3 = createPickupPath(row3Start, row3End, 20);
-        score3 = createCurve(row3Start, row3Control, row3End);
+//        score3 = createCurve(row3Start, row3Control, scorePose);
+        score3 = createLine(row3Start, scorePose);
 
-        row2 = createCurve(scorePose, row2Control, row2Start);
+//        row2 = createCurve(scorePose, row2Control, row2Start);
+        row2 = createLine(scorePose, row2Start);
         pickup2 = createPickupPath(row2Start, row2End, 20);
-        score2 = createCurve(row2Start, row2Control, scorePose);
+//        score2 = createCurve(row2Start, row2Control, scorePose);
+        score2 = createLine(row2Start, scorePose);
 
-        row1 = createCurve(scorePose, row1Control, row1Start);
+//        row1 = createCurve(scorePose, row1Control, row1Start);
+        row1 = createLine(scorePose, row1Start);
         pickup1 = createPickupPath(row1Start, row1End, 20);
-        score1 = createCurve(row1Start, row1Control, scorePose);
+//        score1 = createCurve(row1Start, row1Control, scorePose);
+        score1 = createLine(row1Start, scorePose);
     }
 
     public void autonomousPathUpdate() {
@@ -63,16 +69,17 @@ public class AutonRed extends OpMode {
             case 0:
                 if (!follower.isBusy() && pathTimer.getElapsedTime() < 250) {
                     follower.followPath(score, true);
-                    outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityLong);
+                    outtake.setOuttakeVelocity(Math.PI*1.6);
+                } else {
+                    handleShooting(
+                            2500,
+                            500,
+                            1000,
+                            750,
+                            1000,
+                            750,
+                            1);
                 }
-                handleShooting(
-                        2500,
-                        250,
-                        2000,
-                        250,
-                        2000,
-                        500,
-                        1);
                 break;
             case 1:
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
@@ -89,7 +96,7 @@ public class AutonRed extends OpMode {
                 }
                 break;
             case 3:
-                handleIntake(500,200);
+                handleIntake(750,0);
                 if(!follower.isBusy()) {
                     intake.stopMotor();
                     follower.followPath(score1, true);
@@ -99,15 +106,16 @@ public class AutonRed extends OpMode {
             case 4:
                 if (follower.isBusy()) {
                     outtake.setOuttakeVelocity(Math.PI*1.7);
+                } else {
+                    handleShooting(
+                            3000,
+                            750,
+                            1000,
+                            1000,
+                            1000,
+                            750,
+                            5);
                 }
-                handleShooting(
-                        2500,
-                        250,
-                        2000,
-                        500,
-                        2000,
-                        250,
-                        5);
                 break;
             case 5:
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
@@ -124,7 +132,7 @@ public class AutonRed extends OpMode {
                 }
                 break;
             case 7:
-                handleIntake(500,400);
+                handleIntake(750,0);
                 if(!follower.isBusy()) {
                     intake.stopMotor();
                     follower.followPath(score2, true);
@@ -134,15 +142,16 @@ public class AutonRed extends OpMode {
             case 8:
                 if (follower.isBusy()) {
                     outtake.setOuttakeVelocity(Math.PI*1.7);
+                } else {
+                    handleShooting(
+                            4000,
+                            750,
+                            1000,
+                            1000,
+                            1000,
+                            750,
+                            9);
                 }
-                handleShooting(
-                        2250,
-                        250,
-                        2000,
-                        500,
-                        2000,
-                        500,
-                        9);
                 break;
             case 9:
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
@@ -159,7 +168,7 @@ public class AutonRed extends OpMode {
                 }
                 break;
             case 11:
-                handleIntake(500,200);
+                handleIntake(750,0);
                 if(!follower.isBusy()) {
                     intake.stopMotor();
                     follower.followPath(score3, true);
@@ -169,15 +178,16 @@ public class AutonRed extends OpMode {
             case 12:
                 if (follower.isBusy()) {
                     outtake.setOuttakeVelocity(Math.PI*1.7);
+                } else {
+                    handleShooting(
+                            5000,
+                            750,
+                            1000,
+                            1000,
+                            1000,
+                            750,
+                            13);
                 }
-                handleShooting(
-                        2500,
-                        250,
-                        2000,
-                        250,
-                        2000,
-                        500,
-                        13);
                 break;
             case 13:
                 if(!follower.isBusy()) {

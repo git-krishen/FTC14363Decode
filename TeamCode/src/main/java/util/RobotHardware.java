@@ -47,7 +47,7 @@ public class RobotHardware {
     public AnalogInput turretEncoder;
 
     // Limelight
-    public Limelight3A limelight;
+//    public Limelight3A limelight;
 
     // Camera
     public WebcamName webcam;
@@ -132,11 +132,11 @@ public class RobotHardware {
         turretEncoder = hardwareMap.get(AnalogInput.class, "turretEncoder");
 
         // ******************* LIMELIGHT ******************* //
-        limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.setPollRateHz(100);
-        limelight.pipelineSwitch(9);
-        limelight.updateRobotOrientation(0);
-        limelight.start();
+//        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+//        limelight.setPollRateHz(100);
+//        limelight.pipelineSwitch(9);
+//        limelight.updateRobotOrientation(0);
+//        limelight.start();
 
         // ******************* CAMERA ******************* //
 //        WebcamName webcam = hardwareMap.get(WebcamName.class, "webcam1");

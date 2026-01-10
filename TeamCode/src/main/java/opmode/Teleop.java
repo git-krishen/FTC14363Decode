@@ -27,6 +27,7 @@ import util.RobotHardware;
 public class Teleop extends CommandOpMode {
     private final RobotHardware robot = RobotHardware.getInstance();
     private GamepadEx driver;
+    private GamepadEx driver2;
     private MecanumDrive drivetrain;
     private Intake intake;
     private Outtake outtake;
@@ -38,6 +39,7 @@ public class Teleop extends CommandOpMode {
     public void initialize() {
         CommandScheduler.getInstance().reset();
         driver = new GamepadEx(gamepad1);
+        driver2 = new GamepadEx(gamepad2);
         robot.init(hardwareMap, driver);
 
         drivetrain = new MecanumDrive();
@@ -52,12 +54,12 @@ public class Teleop extends CommandOpMode {
     @Override
     public void run() {
         CommandScheduler.getInstance().run();
-        robot.follower.update();
+        robot.follower.update();        robot.telemetryManager.addData("Turret", turret.getPositionProportion() + " " + turret.getPositionDegrees());
+        robot.telemetryManager.update();
     }
 
     private void configureBindings() {
         robot.telemetryManager.debug(String.format("%f %f %f", driver.getLeftY(), driver.getLeftX(), driver.getRightX()));
-        robot.telemetryManager.addData("Turret", turret.getPositionProportion());
         drivetrain.setDefaultCommand(new RunCommand(() -> {
             double ly = Math.abs(driver.getLeftY()) > 0.15 ? driver.getLeftY() : 0;
             double lx = Math.abs(driver.getLeftX()) > 0.15 ? driver.getLeftX() : 0;
@@ -84,20 +86,48 @@ public class Teleop extends CommandOpMode {
 //        );
 
 //        turret.setDefaultCommand(new RunCommand(() -> turret.lockToAprilTag(), turret));
-        driver.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whileHeld(
+        driver2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whileHeld(
                 new StartEndCommand(
-                        () -> turret.setPower(0.75),
+                        () -> {
+                            if (driver2.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.3) {
+                                turret.setPower(-0.5);
+                            } else {
+                                turret.setPower(-1);
+                            }
+                        },
                         () -> turret.stopTurret(),
                         turret
                 )
         );
-        driver.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).whileHeld(
+        driver2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whileHeld(
                 new StartEndCommand(
-                        () -> turret.setPower(-0.75),
+                        () -> {
+                            if (driver2.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.3) {
+                                turret.setPower(0.5);
+                            } else {
+                                turret.setPower(1);
+                            }
+                        },
                         () -> turret.stopTurret(),
                         turret
                 )
         );
+
+        driver2.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whileHeld(
+                new StartEndCommand(
+                        () -> turret.setTargetPositionDegrees(-180),
+                        () -> turret.stopTurret(),
+                        turret
+                )
+        );
+        driver2.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).whileHeld(
+                new StartEndCommand(
+                        () -> turret.setTargetPositionUnitCircle(Math.PI/2),
+                        () -> turret.stopTurret(),
+                        turret
+                )
+        );
+
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(
                 new InstantCommand(

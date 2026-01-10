@@ -28,7 +28,7 @@ public class Turret implements Subsystem {
     }
 
     public void setTargetPositionUnitCircle(double radians) {
-        robot.turretServo.setPower(pid.calculate(getPositionUnitCircle(), Math.clamp(radians, -Math.PI/2, Math.PI/2)));
+        robot.turretServo.setPower(pid.calculate(getPositionUnitCircle(), radians));
     }
 
     // This operates by unit circle rules, so 90 is forward
@@ -50,12 +50,12 @@ public class Turret implements Subsystem {
     public void lockToAprilTag() {
         double x = robot.follower.getPose().getX();
         double y = robot.follower.getPose().getY();
-        double heading = robot.follower.getPose().getHeading() + getPositionUnitCircle();
+        double botHeading = robot.follower.getPose().getHeading();
         x += RobotConstants.Turret.turretOffsetX;
         y += RobotConstants.Turret.turretOffsetY;
         double distY = RobotConstants.Turret.scoreRedY - y;
         double distX = RobotConstants.Turret.scoreRedX - x;
-        double targetHeading = (Math.PI/2)-Math.atan2(distY, distX);
+        double targetHeading = Math.atan2(distY, distX)-botHeading;
         setTargetPositionUnitCircle(targetHeading);
     }
 }
