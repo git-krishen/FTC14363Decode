@@ -17,8 +17,8 @@ import subsystems.Outtake;
 import util.RobotConstants;
 import util.RobotHardware;
 
-@Autonomous(name = "AutonBlue", group = "Test")
-public class AutonBlue extends OpMode {
+@Autonomous(name = "ShootAndGTFOBlue", group = "Test")
+public class ShootAndGTFOBlue extends OpMode {
     RobotHardware robot;
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
@@ -27,7 +27,7 @@ public class AutonBlue extends OpMode {
     // Poses
     private final Pose startPose = new Pose(57, 8.5, Math.toRadians(270));
     private final Pose row1Control = new Pose(50, 10, Math.toRadians(210));
-    private final Pose row1Start = new Pose(54, 24+2, Math.toRadians(180));
+    private final Pose row1Start = new Pose(40, 6, Math.toRadians(270));
     private final Pose row1End = new Pose(24, 24+2, Math.toRadians(180));
     //    private final Pose row2Control = new Pose(72-8, 72-24, Math.toRadians(30));
 //    private final Pose row2Start = new Pose(108-18, 60+8, Math.toRadians(0));
@@ -39,9 +39,7 @@ public class AutonBlue extends OpMode {
     private final Pose row3Start = new Pose(54, 24+48, Math.toRadians(180));
     private final Pose row3End = new Pose(24, 24+48, Math.toRadians(180));
 //    private final Pose scorePoseTop = new Pose(84, 60, Math.toRadians(135));
-    private final Pose scorePose = new Pose(54, 12, Math.toRadians(283)); //y=18 // 240
-//    private final Pose scorePose2 = new Pose(54, 12, Math.toRadians(285));
-//    private final Pose scorePose3 = new Pose(54, 12, Math.toRadians(280));
+    private final Pose scorePose = new Pose(54, 12, Math.toRadians(298)); //y=18 // 240
 
     // Paths
     private PathChain row1, row2, row3, pickup1, pickup2, pickup3, score, score1, score2, score3;
@@ -75,12 +73,12 @@ public class AutonBlue extends OpMode {
             case 0:
                 if (!follower.isBusy() && pathTimer.getElapsedTime() < 250) {
                     follower.followPath(score, true);
-                    outtake.setOuttakeVelocity(Math.PI*1.5);
+                    outtake.setOuttakeVelocity(Math.PI*1.6);
                 } else {
                     handleShooting(
                             2500,
                             500,
-                            1000,
+                            1250,
                             750,
                             1000,
                             750,
@@ -96,112 +94,6 @@ public class AutonBlue extends OpMode {
                 }
                 break;
             case 2:
-                if(!follower.isBusy()) {
-                    follower.followPath(pickup1);
-                    setPathState(3);
-                }
-                break;
-            case 3:
-                handleIntake(600,0);
-                if(!follower.isBusy()) {
-                    intake.stopMotor();
-                    follower.followPath(score1, true);
-                    setPathState(4);
-                }
-                break;
-            case 4:
-                if (follower.isBusy()) {
-                    outtake.setOuttakeVelocity(Math.PI*1.7);
-                } else {
-                    handleShooting(
-                            3000,
-                            750,
-                            1000,
-                            1000,
-                            1000,
-                            750,
-                            5);
-                }
-                break;
-            case 5:
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
-                if(!follower.isBusy()) {
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(row2);
-                    setPathState(6);
-                }
-                break;
-            case 6:
-                if(!follower.isBusy()) {
-                    follower.followPath(pickup2);
-                    setPathState(7);
-                }
-                break;
-            case 7:
-                handleIntake(750,0);
-                if(!follower.isBusy()) {
-                    intake.stopMotor();
-                    follower.followPath(score2, true);
-                    setPathState(8);
-                }
-                break;
-            case 8:
-                if (follower.isBusy()) {
-                    outtake.setOuttakeVelocity(Math.PI*1.7);
-                } else {
-                    handleShooting(
-                            4000,
-                            750,
-                            1000,
-                            1000,
-                            1000,
-                            750,
-                            9);
-                }
-                break;
-            case 9:
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
-                if(!follower.isBusy()) {
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(row3);
-                    setPathState(10);
-                }
-                break;
-            case 10:
-                if(!follower.isBusy()) {
-                    follower.followPath(pickup3);
-                    setPathState(11);
-                }
-                break;
-            case 11:
-                handleIntake(750,0);
-                if(!follower.isBusy()) {
-//                    intake.stopMotor();
-//                    follower.followPath(score3, true);
-                    setPathState(12);
-                }
-                break;
-            case 12:
-//                if (follower.isBusy()) {
-//                    outtake.setOuttakeVelocity(Math.PI*1.7);
-//                } else {
-//                    handleShooting(
-//                            5000,
-//                            750,
-//                            1000,
-//                            1000,
-//                            1000,
-//                            750,
-//                            13);
-//                }
-//                break;
-//            case 13:
-//                if(!follower.isBusy()) {
-//                    follower.followPath(row1);
-//                    setPathState(14);
-//                }
-//                break;
-//            case 14:
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
                     /* Set the state to a Case we won't use or define, so it just stops running an new paths */

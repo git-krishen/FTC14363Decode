@@ -17,31 +17,26 @@ import subsystems.Outtake;
 import util.RobotConstants;
 import util.RobotHardware;
 
-@Autonomous(name = "AutonBlue", group = "Test")
-public class AutonBlue extends OpMode {
+@Autonomous(name = "AutonRedIntake", group = "Test")
+public class AutonRed_Intake extends OpMode {
     RobotHardware robot;
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
 
     // Poses
-    private final Pose startPose = new Pose(57, 8.5, Math.toRadians(270));
-    private final Pose row1Control = new Pose(50, 10, Math.toRadians(210));
-    private final Pose row1Start = new Pose(54, 24+2, Math.toRadians(180));
-    private final Pose row1End = new Pose(24, 24+2, Math.toRadians(180));
-    //    private final Pose row2Control = new Pose(72-8, 72-24, Math.toRadians(30));
-//    private final Pose row2Start = new Pose(108-18, 60+8, Math.toRadians(0));
-//    private final Pose row2End = new Pose(132-14, 60+8, Math.toRadians(0));
-    private final Pose row2Control = new Pose(58, 10+22, Math.toRadians(210));
-    private final Pose row2Start = new Pose(54, 24+24, Math.toRadians(180));
-    private final Pose row2End = new Pose(24, 24+22, Math.toRadians(180));
-    private final Pose row3Control = new Pose(58, 10+48, Math.toRadians(210));
-    private final Pose row3Start = new Pose(54, 24+48, Math.toRadians(180));
-    private final Pose row3End = new Pose(24, 24+48, Math.toRadians(180));
-//    private final Pose scorePoseTop = new Pose(84, 60, Math.toRadians(135));
-    private final Pose scorePose = new Pose(54, 12, Math.toRadians(283)); //y=18 // 240
-//    private final Pose scorePose2 = new Pose(54, 12, Math.toRadians(285));
-//    private final Pose scorePose3 = new Pose(54, 12, Math.toRadians(280));
+    private final Pose startPose = new Pose(87, 8.5, Math.toRadians(270));
+    private final Pose row1Control = new Pose(94, 10, Math.toRadians(30));
+    private final Pose row1Start = new Pose(90, 24+2, Math.toRadians(0));
+    private final Pose row1End = new Pose(120, 24+2, Math.toRadians(0));
+    private final Pose row2Control = new Pose(76, 10+22, Math.toRadians(30));
+    private final Pose row2Start = new Pose(90, 24+24, Math.toRadians(0));
+    private final Pose row2End = new Pose(122, 24+22, Math.toRadians(0));
+    private final Pose row3Control = new Pose(86, 10+48, Math.toRadians(30));
+    private final Pose row3Start = new Pose(90, 24+48, Math.toRadians(0));
+    private final Pose row3End = new Pose(112, 24+48, Math.toRadians(0));
+    private final Pose scorePose = new Pose(90, 12, Math.toRadians(245)); //y=18 // 240
+    private final Pose scorePose2 = new Pose(90, 12, Math.toRadians(240));
 
     // Paths
     private PathChain row1, row2, row3, pickup1, pickup2, pickup3, score, score1, score2, score3;
@@ -55,13 +50,13 @@ public class AutonBlue extends OpMode {
         row3 = createLine(scorePose, row3Start);
         pickup3 = createPickupPath(row3Start, row3End, 20);
 //        score3 = createCurve(row3Start, row3Control, scorePose);
-        score3 = createLine(row3Start, scorePose);
+        score3 = createLine(row3Start, scorePose2);
 
 //        row2 = createCurve(scorePose, row2Control, row2Start);
         row2 = createLine(scorePose, row2Start);
         pickup2 = createPickupPath(row2Start, row2End, 20);
 //        score2 = createCurve(row2Start, row2Control, scorePose);
-        score2 = createLine(row2Start, scorePose);
+        score2 = createLine(row2Start, scorePose2);
 
 //        row1 = createCurve(scorePose, row1Control, row1Start);
         row1 = createLine(scorePose, row1Start);
@@ -75,7 +70,7 @@ public class AutonBlue extends OpMode {
             case 0:
                 if (!follower.isBusy() && pathTimer.getElapsedTime() < 250) {
                     follower.followPath(score, true);
-                    outtake.setOuttakeVelocity(Math.PI*1.5);
+                    outtake.setOuttakeVelocity(Math.PI*1.6);
                 } else {
                     handleShooting(
                             2500,
@@ -102,9 +97,8 @@ public class AutonBlue extends OpMode {
                 }
                 break;
             case 3:
-                handleIntake(600,0);
+                handleIntake(750,0);
                 if(!follower.isBusy()) {
-                    intake.stopMotor();
                     follower.followPath(score1, true);
                     setPathState(4);
                 }
@@ -115,11 +109,11 @@ public class AutonBlue extends OpMode {
                 } else {
                     handleShooting(
                             3000,
-                            750,
+                            500,
                             1000,
+                            500,
                             1000,
-                            1000,
-                            750,
+                            500,
                             5);
                 }
                 break;
@@ -140,7 +134,6 @@ public class AutonBlue extends OpMode {
             case 7:
                 handleIntake(750,0);
                 if(!follower.isBusy()) {
-                    intake.stopMotor();
                     follower.followPath(score2, true);
                     setPathState(8);
                 }
@@ -153,7 +146,7 @@ public class AutonBlue extends OpMode {
                             4000,
                             750,
                             1000,
-                            1000,
+                            1250,
                             1000,
                             750,
                             9);
@@ -176,7 +169,6 @@ public class AutonBlue extends OpMode {
             case 11:
                 handleIntake(750,0);
                 if(!follower.isBusy()) {
-//                    intake.stopMotor();
 //                    follower.followPath(score3, true);
                     setPathState(12);
                 }
@@ -255,7 +247,6 @@ public class AutonBlue extends OpMode {
             outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
             intake.setIntakeMotorVelocity(RobotConstants.Intake.intakeVelocity);
         } else if (pathTimer.getElapsedTime() < startDelay+shotOneTiming+shotTwoDelay+shotTwoTiming+shotThreeDelay) {
-            intake.stopMotor();
             outtake.stopFeederMotor();
         } else if (pathTimer.getElapsedTime() < startDelay+shotOneTiming+shotTwoDelay+shotTwoTiming+shotThreeDelay+shotThreeTiming) {
             outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
@@ -276,8 +267,6 @@ public class AutonBlue extends OpMode {
             outtake.setFeederVelocity(-RobotConstants.Outtake.feederVelocity);
         } else if (follower.getPathCompletion() < 1) {
             outtake.stopFeederMotor();
-        } else {
-            intake.stopMotor();
         }
     }
 

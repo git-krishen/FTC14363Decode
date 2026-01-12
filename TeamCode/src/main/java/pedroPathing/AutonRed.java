@@ -27,15 +27,16 @@ public class AutonRed extends OpMode {
     // Poses
     private final Pose startPose = new Pose(87, 8.5, Math.toRadians(270));
     private final Pose row1Control = new Pose(94, 10, Math.toRadians(30));
-    private final Pose row1Start = new Pose(90, 24, Math.toRadians(0));
-    private final Pose row1End = new Pose(120, 24, Math.toRadians(0));
+    private final Pose row1Start = new Pose(90, 24+2, Math.toRadians(0));
+    private final Pose row1End = new Pose(120, 24+2, Math.toRadians(0));
     private final Pose row2Control = new Pose(76, 10+22, Math.toRadians(30));
     private final Pose row2Start = new Pose(90, 24+24, Math.toRadians(0));
-    private final Pose row2End = new Pose(120, 24+22, Math.toRadians(0));
+    private final Pose row2End = new Pose(122, 24+22, Math.toRadians(0));
     private final Pose row3Control = new Pose(86, 10+48, Math.toRadians(30));
     private final Pose row3Start = new Pose(90, 24+48, Math.toRadians(0));
     private final Pose row3End = new Pose(112, 24+48, Math.toRadians(0));
     private final Pose scorePose = new Pose(90, 12, Math.toRadians(245)); //y=18 // 240
+    private final Pose scorePose2 = new Pose(90, 12, Math.toRadians(240));
 
     // Paths
     private PathChain row1, row2, row3, pickup1, pickup2, pickup3, score, score1, score2, score3;
@@ -49,13 +50,13 @@ public class AutonRed extends OpMode {
         row3 = createLine(scorePose, row3Start);
         pickup3 = createPickupPath(row3Start, row3End, 20);
 //        score3 = createCurve(row3Start, row3Control, scorePose);
-        score3 = createLine(row3Start, scorePose);
+        score3 = createLine(row3Start, scorePose2);
 
 //        row2 = createCurve(scorePose, row2Control, row2Start);
         row2 = createLine(scorePose, row2Start);
         pickup2 = createPickupPath(row2Start, row2End, 20);
 //        score2 = createCurve(row2Start, row2Control, scorePose);
-        score2 = createLine(row2Start, scorePose);
+        score2 = createLine(row2Start, scorePose2);
 
 //        row1 = createCurve(scorePose, row1Control, row1Start);
         row1 = createLine(scorePose, row1Start);
@@ -111,7 +112,7 @@ public class AutonRed extends OpMode {
                             3000,
                             750,
                             1000,
-                            1000,
+                            1250,
                             1000,
                             750,
                             5);
@@ -147,7 +148,7 @@ public class AutonRed extends OpMode {
                             4000,
                             750,
                             1000,
-                            1000,
+                            1250,
                             1000,
                             750,
                             9);
@@ -170,32 +171,32 @@ public class AutonRed extends OpMode {
             case 11:
                 handleIntake(750,0);
                 if(!follower.isBusy()) {
-                    intake.stopMotor();
-                    follower.followPath(score3, true);
+//                    intake.stopMotor();
+//                    follower.followPath(score3, true);
                     setPathState(12);
                 }
                 break;
             case 12:
-                if (follower.isBusy()) {
-                    outtake.setOuttakeVelocity(Math.PI*1.7);
-                } else {
-                    handleShooting(
-                            5000,
-                            750,
-                            1000,
-                            1000,
-                            1000,
-                            750,
-                            13);
-                }
-                break;
-            case 13:
-                if(!follower.isBusy()) {
-                    follower.followPath(row1);
-                    setPathState(14);
-                }
-                break;
-            case 14:
+//                if (follower.isBusy()) {
+//                    outtake.setOuttakeVelocity(Math.PI*1.7);
+//                } else {
+//                    handleShooting(
+//                            5000,
+//                            750,
+//                            1000,
+//                            1000,
+//                            1000,
+//                            750,
+//                            13);
+//                }
+//                break;
+//            case 13:
+//                if(!follower.isBusy()) {
+//                    follower.followPath(row1);
+//                    setPathState(14);
+//                }
+//                break;
+//            case 14:
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
                     /* Set the state to a Case we won't use or define, so it just stops running an new paths */
