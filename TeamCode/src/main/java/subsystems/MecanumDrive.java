@@ -66,7 +66,6 @@ public class MecanumDrive implements Subsystem {
     public void drive(double ly, double lx, double rx) {
 //        robot.telemetryManager.addData("Drive", String.format("driving %f %f %f", ly, lx, rx));
 //        robot.telemetryManager.addData("Pose", "x: " + robot.follower.getPose().getX() + " | y: " + robot.follower.getPose().getY() + " | heading: " + robot.follower.getHeading());
-//        robot.telemetryManager.update();
 //        Limelight.setTargetID(20);
 
         if (ly != 0 && lx != 0 && robot.leftRear.getZeroPowerBehavior().equals(DcMotor.ZeroPowerBehavior.BRAKE)) {

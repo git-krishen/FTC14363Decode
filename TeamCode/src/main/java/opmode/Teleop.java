@@ -14,9 +14,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
+import java.util.Arrays;
 import java.util.Set;
 
 import subsystems.Intake;
+import subsystems.Limelight;
 import subsystems.MecanumDrive;
 import subsystems.Outtake;
 import subsystems.Turret;
@@ -54,7 +56,12 @@ public class Teleop extends CommandOpMode {
     @Override
     public void run() {
         CommandScheduler.getInstance().run();
-        robot.follower.update();        robot.telemetryManager.addData("Turret", turret.getPositionProportion() + " " + turret.getPositionDegrees());
+        robot.follower.update();
+        robot.telemetryManager.addData("x", robot.follower.getPose().getX());
+        robot.telemetryManager.addData("y", robot.follower.getPose().getY());
+        robot.telemetryManager.addData("heading", robot.follower.getPose().getHeading());
+        robot.telemetryManager.addData("llPose", Arrays.toString(Limelight.getOrientationArrayString()));
+        robot.telemetryManager.addData("turret", turret.getPositionDegrees());
         robot.telemetryManager.update();
     }
 
@@ -90,7 +97,7 @@ public class Teleop extends CommandOpMode {
                 new StartEndCommand(
                         () -> {
                             if (driver2.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.3) {
-                                turret.setPower(-0.5);
+                                turret.setPower(-0.25);
                             } else {
                                 turret.setPower(-1);
                             }
@@ -103,7 +110,7 @@ public class Teleop extends CommandOpMode {
                 new StartEndCommand(
                         () -> {
                             if (driver2.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.3) {
-                                turret.setPower(0.5);
+                                turret.setPower(0.25);
                             } else {
                                 turret.setPower(1);
                             }
@@ -127,7 +134,6 @@ public class Teleop extends CommandOpMode {
                         turret
                 )
         );
-
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(
                 new InstantCommand(
@@ -178,7 +184,7 @@ public class Teleop extends CommandOpMode {
                 double triggerVal = driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
                 if (!triggered && triggerVal>0.3) {
                     double curr = intake.getIntakePower();
-                    intake.setIntakeMotorVelocity(curr>0.1 ? 0 : RobotConstants.Intake.intakeVelocity);
+                    intake.setIntakePower(curr>0.1 ? 0 : 1);
                     triggered = true;
                 } else if (triggered && triggerVal<0.3) {
                     triggered = false;

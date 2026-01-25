@@ -20,6 +20,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
 import pedroPathing.Constants;
+import subsystems.Limelight;
 
 public class RobotHardware {
     // Drivetrain
@@ -47,7 +48,7 @@ public class RobotHardware {
     public AnalogInput turretEncoder;
 
     // Limelight
-//    public Limelight3A limelight;
+    public Limelight3A limelight;
 
     // Camera
     public WebcamName webcam;
@@ -132,11 +133,20 @@ public class RobotHardware {
         turretEncoder = hardwareMap.get(AnalogInput.class, "turretEncoder");
 
         // ******************* LIMELIGHT ******************* //
-//        limelight = hardwareMap.get(Limelight3A.class, "limelight");
-//        limelight.setPollRateHz(100);
-//        limelight.pipelineSwitch(9);
-//        limelight.updateRobotOrientation(0);
-//        limelight.start();
+        Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.setPollRateHz(100);
+        limelight.pipelineSwitch(9);
+        limelight.updateRobotOrientation(0);
+        limelight.start();
+        Limelight.setTargetID(24);
+        Limelight.updateLimelightPose(
+                RobotConstants.Limelight.axisForward+RobotConstants.Limelight.rotRadius,
+                RobotConstants.Limelight.axisRight,
+                RobotConstants.Limelight.axisUp,
+                180,
+                18,
+                0
+                );
 
         // ******************* CAMERA ******************* //
 //        WebcamName webcam = hardwareMap.get(WebcamName.class, "webcam1");

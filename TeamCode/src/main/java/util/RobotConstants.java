@@ -24,6 +24,7 @@ public class RobotConstants {
     }
 
     public static class Turret {
+        // Analog 0, Servo 0
 //        public static double maxServoPos = Math.PI;
 //        public static double minServoPos = 0;
         public static double encoderOffset = 0;
@@ -33,5 +34,14 @@ public class RobotConstants {
         public static double scoreRedY = 141.0;
         public static double scoreBlueX = 0;
         public static double scoreBlueY = 141.0;
+        public static double gearRatio = 29.0/120.0;
+        // turret gear ratio 29:120
+    }
+
+    public static class Limelight {
+        public static double axisForward = -1.57; // -40 mm
+        public static double axisRight = 2.48; // 63 mm
+        public static double axisUp = 16.54; // 420 mm
+        public static double rotRadius = 0.81; // 20.5 mm
     }
 }
