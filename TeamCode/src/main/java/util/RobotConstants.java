@@ -1,5 +1,7 @@
 package util;
 
+import com.bylazar.configurables.annotations.Configurable;
+
 public class RobotConstants {
     public static class Drivetrain {
         public static String leftFront = "frontLeftMotor"; // 1
@@ -13,6 +15,7 @@ public class RobotConstants {
         public static double intakeVelocity = Math.PI*2;
     }
 
+    @Configurable
     public static class Outtake {
         public static String outtake = "outtakeMotor"; // 2e
         public static String outtakeFollower = "outtakeFollowMotor"; // 3e
@@ -21,6 +24,14 @@ public class RobotConstants {
         //The only one that actually does anything (degree ticks per second)
         public static double outtakeVelocityShort = Math.PI*0.85; // 0.0375 // (500/60.0)*28;
         public static double outtakeVelocityLong = Math.PI*1.18; // 0.0435
+        public static double kP = 0.004;
+        public static double kI = 0.000001;
+        public static double kD = 0;
+        public static double kS = 0.05;
+        public static double kV = 0.0003;
+        public static double kA = 0;
+        public static double maxI = 0.3;
+        public static double maxAccel = 15000; // ticks/s^2
     }
 
     public static class Turret {
@@ -35,7 +46,9 @@ public class RobotConstants {
         public static double scoreBlueX = 0;
         public static double scoreBlueY = 141.0;
         public static double gearRatio = 29.0/120.0;
-        // turret gear ratio 29:120
+        public static double kP = 0.015;
+        public static double kI = 0.0005;
+        public static double kD = 0.0025;
     }
 
     public static class Limelight {

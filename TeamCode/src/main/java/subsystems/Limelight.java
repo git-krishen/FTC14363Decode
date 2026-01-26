@@ -29,31 +29,31 @@ import java.util.stream.Collectors;
 import util.RobotHardware;
 
 public class Limelight implements Subsystem {
-    private static RobotHardware robot;
-    private static OptionalInt targetID;
+    private RobotHardware robot;
+    private OptionalInt targetID;
 
-    static {
+    public Limelight() {
         robot = RobotHardware.getInstance();
         targetID = OptionalInt.empty();
     }
 
-    public static void setTargetID(int id) {
+    public void setTargetID(int id) {
         targetID = OptionalInt.of(id);
     }
 
-    public static void setRobotYaw(double angle) {
-        robot.limelight.updateRobotOrientation(angle);
+    public void setRobotYaw(double angle) {
+        robot.ll.updateRobotOrientation(angle);
     }
 
-    public static boolean hasTarget() {
+    public boolean hasTarget() {
         return getTagIDList().contains(targetID);
     }
 
-    public static boolean hasTag(int id) {
+    public boolean hasTag(int id) {
         return getTagIDList().contains(id);
     }
 
-    public static OptionalDouble getTargetX() {
+    public OptionalDouble getTargetX() {
         Optional<FiducialResult> targetFiducial = getTargetFiducial();
         if (targetFiducial.isPresent()) {
             return OptionalDouble.of(targetFiducial.get().getTargetXDegrees());
@@ -61,7 +61,7 @@ public class Limelight implements Subsystem {
         return OptionalDouble.empty();
     }
 
-    public static OptionalDouble getTargetY() {
+    public OptionalDouble getTargetY() {
         Optional<FiducialResult> targetFiducial = getTargetFiducial();
         if (targetFiducial.isPresent()) {
             return OptionalDouble.of(targetFiducial.get().getTargetYDegrees());
@@ -70,7 +70,7 @@ public class Limelight implements Subsystem {
     }
 
 
-    public static OptionalDouble getTargetArea() {
+    public OptionalDouble getTargetArea() {
         Optional<FiducialResult> targetFiducial = getTargetFiducial();
         if (targetFiducial.isPresent()) {
             return OptionalDouble.of(targetFiducial.get().getTargetArea());
@@ -78,7 +78,7 @@ public class Limelight implements Subsystem {
         return OptionalDouble.empty();
     }
 
-    public static ArrayList<Integer> getTagIDList() {
+    public ArrayList<Integer> getTagIDList() {
         ArrayList<Integer> tags = new ArrayList<Integer>();
         List<FiducialResult> fiducials = getFiducialList();
         for (FiducialResult fiducial : fiducials) {
@@ -88,12 +88,20 @@ public class Limelight implements Subsystem {
         return tags;
     }
 
-    private static List<FiducialResult> getFiducialList() {
-        LLResult result = robot.limelight.getLatestResult();
+    public Optional<Pose> getRobotPose() {
+        List<FiducialResult> list = getFiducialList();
+        if (list == null || list.isEmpty()) return Optional.empty();
+        Pose3D rawPose = list.getFirst().getRobotPoseFieldSpace();
+        Pose pose = new Pose(rawPose.getPosition().x, rawPose.getPosition().y, rawPose.getOrientation().getYaw(AngleUnit.DEGREES));
+        return Optional.of(pose);
+    }
+
+    private List<FiducialResult> getFiducialList() {
+        LLResult result = robot.ll.getLatestResult();
         return result.getFiducialResults();
     }
 
-    private static Optional<FiducialResult> getTargetFiducial() {
+    private Optional<FiducialResult> getTargetFiducial() {
         if (targetID.isEmpty()) {
             return Optional.empty();
         }
@@ -107,7 +115,7 @@ public class Limelight implements Subsystem {
     }
 
     // Meters, degrees
-    public static boolean updateLimelightPose(double forward, double side, double up, double yaw, double pitch, double roll) {
+    public boolean updateLimelightPose(double forward, double side, double up, double yaw, double pitch, double roll) {
         try {
             JSONObject pipelineUpdate = new JSONObject();
             double[] cameraPose = {forward, side, up, roll, pitch, yaw};
@@ -129,7 +137,7 @@ public class Limelight implements Subsystem {
         }
     }
 
-    public static String[] getOrientationArrayString() {
+    public String[] getOrientationArrayString() {
         JSONObject statusJson = sendGetRequest("/results");
         if(statusJson == null)
         {
@@ -158,7 +166,7 @@ public class Limelight implements Subsystem {
         }
     }
 
-    private static boolean sendPostRequest(String endpoint, String data) {
+    private boolean sendPostRequest(String endpoint, String data) {
         String baseUrl = "http://" + "172.29.0.1" + ":5807";;
         HttpURLConnection connection = null;
         try {
@@ -194,7 +202,7 @@ public class Limelight implements Subsystem {
         return false;
     }
 
-    private static JSONObject sendGetRequest(String endpoint) {
+    private JSONObject sendGetRequest(String endpoint) {
         String baseUrl = "http://" + "172.29.0.1" + ":5807";;
         HttpURLConnection connection = null;
         try {
@@ -221,7 +229,7 @@ public class Limelight implements Subsystem {
         return null;
     }
 
-    private static String readResponse(HttpURLConnection connection) throws IOException {
+    private String readResponse(HttpURLConnection connection) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         StringBuilder response = new StringBuilder();
         String line;

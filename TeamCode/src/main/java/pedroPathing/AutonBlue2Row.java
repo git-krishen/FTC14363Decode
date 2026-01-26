@@ -317,8 +317,8 @@ public class AutonBlue2Row extends OpMode {
         follower = robot.follower;
         buildPaths();
 
-        intake = new Intake();
-        outtake = new Outtake();
+        intake = robot.intake;
+        outtake = robot.outtake;
 
         drawCurrent();
     }

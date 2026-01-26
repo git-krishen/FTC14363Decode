@@ -9,10 +9,10 @@ import com.arcrobotics.ftclib.command.StartEndCommand;
 import com.arcrobotics.ftclib.command.Subsystem;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
+import com.pedropathing.geometry.Pose;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -25,8 +25,7 @@ import subsystems.Turret;
 import util.RobotConstants;
 import util.RobotHardware;
 
-@TeleOp
-public class Teleop extends CommandOpMode {
+public class TeleopBase extends CommandOpMode {
     private final RobotHardware robot = RobotHardware.getInstance();
     private GamepadEx driver;
     private GamepadEx driver2;
@@ -34,6 +33,7 @@ public class Teleop extends CommandOpMode {
     private Intake intake;
     private Outtake outtake;
     private Turret turret;
+    private Limelight limelight;
     // Maybe I need to set states here???
 
 
@@ -44,10 +44,11 @@ public class Teleop extends CommandOpMode {
         driver2 = new GamepadEx(gamepad2);
         robot.init(hardwareMap, driver);
 
-        drivetrain = new MecanumDrive();
-        intake = new Intake();
-        outtake = new Outtake();
-        turret = new Turret();
+        this.drivetrain = robot.drivetrain;
+        this.intake = robot.intake;
+        this.outtake = robot.outtake;
+        this.turret = robot.turret;
+        this.limelight = robot.limelight;
         // Would add telemetry here
 
         configureBindings();
@@ -55,13 +56,14 @@ public class Teleop extends CommandOpMode {
 
     @Override
     public void run() {
+        Pose llPose = robot.limelight.getRobotPose().orElse(new Pose());
         CommandScheduler.getInstance().run();
         robot.follower.update();
-        robot.telemetryManager.addData("x", robot.follower.getPose().getX());
-        robot.telemetryManager.addData("y", robot.follower.getPose().getY());
-        robot.telemetryManager.addData("heading", robot.follower.getPose().getHeading());
-        robot.telemetryManager.addData("llPose", Arrays.toString(Limelight.getOrientationArrayString()));
-        robot.telemetryManager.addData("turret", turret.getPositionDegrees());
+        robot.telemetryManager.addData("x", robot.follower.getPose().getX() + " | " + llPose.getX());
+        robot.telemetryManager.addData("y", robot.follower.getPose().getY() + " | " + llPose.getY());
+        robot.telemetryManager.addData("heading", robot.follower.getPose().getHeading() + " | " + llPose.getHeading());
+        robot.telemetryManager.addData("llRobotPose", Arrays.toString(limelight.getOrientationArrayString()));
+        robot.telemetryManager.addData("turret", turret.getCurrentAngle());
         robot.telemetryManager.update();
     }
 
@@ -78,6 +80,24 @@ public class Teleop extends CommandOpMode {
             );
         }, drivetrain));
 
+        turret.setDefaultCommand(
+                new RunCommand(() -> {
+                    double angle = turret.getCurrentAngle()+180;
+                    double forward = RobotConstants.Limelight.axisForward + Math.cos(Math.toRadians(angle));
+                    double right = RobotConstants.Limelight.axisRight + Math.sin(Math.toRadians(angle));
+                    double up = RobotConstants.Limelight.axisUp;
+                    limelight.updateLimelightPose(
+                            forward,
+                            right,
+                            up,
+                            angle,
+                            18,
+                            0
+                    );
+                    turret.lockToAprilTag();
+                })
+        );
+
         driver.getGamepadButton(GamepadKeys.Button.START).whenPressed(
                 new InstantCommand(() -> {
                     robot.follower.setPose(robot.follower.getPose().setHeading(0));
@@ -92,47 +112,16 @@ public class Teleop extends CommandOpMode {
 //                new InstantCommand(() -> turret.setPosition(turret.getPosition()+0.01))
 //        );
 
-//        turret.setDefaultCommand(new RunCommand(() -> turret.lockToAprilTag(), turret));
+        turret.setDefaultCommand(new RunCommand(() -> turret.lockToAprilTag(), turret));
         driver2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whileHeld(
-                new StartEndCommand(
-                        () -> {
-                            if (driver2.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.3) {
-                                turret.setPower(-0.25);
-                            } else {
-                                turret.setPower(-1);
-                            }
-                        },
-                        () -> turret.stopTurret(),
-                        turret
-                )
+                new InstantCommand(() -> turret.changeTargetRotation(-1))
         );
         driver2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whileHeld(
-                new StartEndCommand(
-                        () -> {
-                            if (driver2.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.3) {
-                                turret.setPower(0.25);
-                            } else {
-                                turret.setPower(1);
-                            }
-                        },
-                        () -> turret.stopTurret(),
-                        turret
-                )
+                new InstantCommand(() -> turret.changeTargetRotation(1))
         );
 
-        driver2.getGamepadButton(GamepadKeys.Button.DPAD_LEFT).whileHeld(
-                new StartEndCommand(
-                        () -> turret.setTargetPositionDegrees(-180),
-                        () -> turret.stopTurret(),
-                        turret
-                )
-        );
-        driver2.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT).whileHeld(
-                new StartEndCommand(
-                        () -> turret.setTargetPositionUnitCircle(Math.PI/2),
-                        () -> turret.stopTurret(),
-                        turret
-                )
+        driver2.getGamepadButton(GamepadKeys.Button.A).whenPressed(
+                new InstantCommand(() -> turret.setTargetRotation(0))
         );
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(

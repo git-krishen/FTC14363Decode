@@ -20,7 +20,11 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
 import pedroPathing.Constants;
+import subsystems.Intake;
 import subsystems.Limelight;
+import subsystems.MecanumDrive;
+import subsystems.Outtake;
+import subsystems.Turret;
 
 public class RobotHardware {
     // Drivetrain
@@ -48,13 +52,20 @@ public class RobotHardware {
     public AnalogInput turretEncoder;
 
     // Limelight
-    public Limelight3A limelight;
+    public Limelight3A ll;
 
     // Camera
     public WebcamName webcam;
 
     // Color Sensor
 //    public ColorSensor colorSensor;
+
+    // Subsystems
+    public Intake intake;
+    public Outtake outtake;
+    public MecanumDrive drivetrain;
+    public Turret turret;
+    public Limelight limelight;
 
     public TelemetryManager telemetryManager;
 
@@ -133,13 +144,18 @@ public class RobotHardware {
         turretEncoder = hardwareMap.get(AnalogInput.class, "turretEncoder");
 
         // ******************* LIMELIGHT ******************* //
-        Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.setPollRateHz(100);
-        limelight.pipelineSwitch(9);
-        limelight.updateRobotOrientation(0);
-        limelight.start();
-        Limelight.setTargetID(24);
-        Limelight.updateLimelightPose(
+        ll = hardwareMap.get(Limelight3A.class, "limelight");
+        ll.setPollRateHz(100);
+        ll.pipelineSwitch(9);
+        ll.updateRobotOrientation(0);
+        ll.start();
+
+        drivetrain = new MecanumDrive();
+        intake = new Intake();
+        outtake = new Outtake();
+        turret = new Turret();
+        limelight = new Limelight();
+        limelight.updateLimelightPose(
                 RobotConstants.Limelight.axisForward+RobotConstants.Limelight.rotRadius,
                 RobotConstants.Limelight.axisRight,
                 RobotConstants.Limelight.axisUp,
