@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import util.HeadingPID;
 import util.RobotConstants;
 import util.RobotHardware;
 
@@ -55,6 +54,7 @@ public class Turret implements Subsystem {
 
     // Basic constructor, defaults to FORWARD direction
     public Turret() {
+        robot = RobotHardware.getInstance();
         rtp = true;
         this.servo = robot.turretServo;
         servoEncoder = robot.turretEncoder;
@@ -64,6 +64,7 @@ public class Turret implements Subsystem {
 
     // Constructor with explicit direction
     public Turret(Direction direction) {
+        robot = RobotHardware.getInstance();
         rtp = true;
         this.servo = robot.turretServo;
         servoEncoder = robot.turretEncoder;
@@ -74,39 +75,24 @@ public class Turret implements Subsystem {
     // Initialization logic for servo and encoder
     private void initialize() {
         servo.setPower(0);
-        try {
-            Thread.sleep(50);
-        } catch (InterruptedException ignored) {
-        }
 
         // Try to get a valid starting position
-        do {
-            STARTPOS = getCurrentAngle();
-            if (Math.abs(STARTPOS) > 1) {
-                previousAngle = getCurrentAngle();
-            } else {
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException ignored) {
-                }
-            }
-            ntry++;
-        } while (Math.abs(previousAngle) < 0.2 && (ntry < 50));
+        previousAngle = 0;
 
         totalRotation = 0;
         homeAngle = previousAngle;
 
         // Default PID coefficients
-        kP = 0.015;
-        kI = 0.0005;
-        kD = 0.0025;
+        kP = RobotConstants.Turret.kP;
+        kI = RobotConstants.Turret.kI;
+        kD = RobotConstants.Turret.kD;
         integralSum = 0.0;
         lastError = 0.0;
-        maxIntegralSum = 100.0;
+        maxIntegralSum = RobotConstants.Turret.maxI;
         pidTimer = new ElapsedTime();
         pidTimer.reset();
 
-        maxPower = 0.25;
+        maxPower = 0.5;
         cliffs = 0;
     }
     // endregion
@@ -213,6 +199,10 @@ public class Turret implements Subsystem {
         return totalRotation;
     }
 
+    public double getTotalRotationTurret() {
+        return totalRotation*RobotConstants.Turret.gearRatio;
+    }
+
     // Get current target rotation
     public double getTargetRotation() {
         return targetRotation;
@@ -220,19 +210,30 @@ public class Turret implements Subsystem {
 
     // Increment target rotation by a value
     public void changeTargetRotation(double change) {
-        targetRotation += change;
+        if ((getTotalRotationTurret() < RobotConstants.Turret.maxAngle || change < 0) && (getTotalRotationTurret() > RobotConstants.Turret.minAngle || change > 0)) targetRotation += change;
     }
 
     // Set target rotation and reset PID
     public void setTargetRotation(double target) {
-        targetRotation = target;
-        resetPID();
+        if (target < RobotConstants.Turret.maxAngle && target > RobotConstants.Turret.minAngle) {
+            targetRotation = target;
+            resetPID();
+        }
     }
+
+    public void setTargetRotationTurret(double target) {
+        if (target < RobotConstants.Turret.maxAngle && target > RobotConstants.Turret.minAngle) {
+            targetRotation = target/RobotConstants.Turret.gearRatio;
+            resetPID();
+        }
+    }
+
+
 
     // Get current angle from encoder (in degrees)
     public double getCurrentAngle() {
         if (servoEncoder == null) return 0;
-        return (servoEncoder.getVoltage() / 3.3) * (direction.equals(Direction.REVERSE) ? -360 : 360);
+        return (servoEncoder.getVoltage() / 3.3) * 360;
     }
 
     // Check if servo is at target (default tolerance)
@@ -249,6 +250,7 @@ public class Turret implements Subsystem {
     public void forceResetTotalRotation() {
         totalRotation = 0;
         previousAngle = getCurrentAngle();
+            homeAngle = previousAngle;
         resetPID();
     }
 
@@ -279,7 +281,7 @@ public class Turret implements Subsystem {
         }
 
         // Update total rotation with wraparound correction
-        totalRotation = currentAngle - homeAngle + cliffs * 360;
+        totalRotation = (currentAngle - homeAngle + cliffs * 360);
         previousAngle = currentAngle;
 
         if (!rtp) return;
@@ -287,16 +289,11 @@ public class Turret implements Subsystem {
         double dt = pidTimer.seconds();
         pidTimer.reset();
 
-        // Ignore unreasonable dt values
-        if (dt < 0.001 || dt > 1.0) {
-            return;
-        }
-
         double error = targetRotation - totalRotation;
 
         // PID integral calculation with clamping
         integralSum += error * dt;
-        integralSum = Math.max(-maxIntegralSum, Math.min(maxIntegralSum, integralSum));
+        integralSum = Math.clamp(integralSum, -maxIntegralSum, maxIntegralSum);
 
         // Integral wind-down in deadzone
         final double INTEGRAL_DEADZONE = 2.0;
@@ -309,6 +306,9 @@ public class Turret implements Subsystem {
         lastError = error;
 
         // PID output calculation
+        kP = RobotConstants.Turret.kP;
+        kI = RobotConstants.Turret.kI;
+        kD = RobotConstants.Turret.kD;
         double pTerm = kP * error;
         double iTerm = kI * integralSum;
         double dTerm = kD * derivative;
@@ -318,7 +318,7 @@ public class Turret implements Subsystem {
         // Deadzone for output
         final double DEADZONE = 0.5;
         if (Math.abs(error) > DEADZONE) {
-            double power = Math.min(maxPower, Math.abs(output)) * Math.signum(output);
+            power = Math.min(maxPower, Math.abs(output)+RobotConstants.Turret.kS) * Math.signum(output);
             setPower(power);
         } else {
             setPower(0);
@@ -331,6 +331,7 @@ public class Turret implements Subsystem {
                 "Current Volts: %.3f\n" +
                         "Current Angle: %.2f\n" +
                         "Total Rotation: %.2f\n" +
+                        "Tot Rot Turret: %.2f\n" +
                         "Target Rotation: %.2f\n" +
                         "Current Power: %.3f\n" +
                         "PID Values: P=%.3f I=%.3f D=%.3f\n" +
@@ -338,6 +339,7 @@ public class Turret implements Subsystem {
                 servoEncoder.getVoltage(),
                 getCurrentAngle(),
                 totalRotation,
+                getTotalRotationTurret(),
                 targetRotation,
                 power,
                 kP, kI, kD,
@@ -348,7 +350,7 @@ public class Turret implements Subsystem {
 
     public void lockToAprilTag() {
         if (robot.limelight.hasTarget()) {
-            changeTargetRotation(-robot.limelight.getTargetX().orElse(0));
+            setTargetRotationTurret(getTotalRotationTurret()-(robot.limelight.getTargetX().orElse(0)));
         }
     }
 

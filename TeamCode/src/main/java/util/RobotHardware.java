@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
@@ -125,14 +126,20 @@ public class RobotHardware {
 
         // ******************* OUTTAKE ******************* //
         outtakeMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Outtake.outtake);
-        outtakeMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        MotorConfigurationType mc = outtakeMotor.getMotorType().clone();
+        mc.setAchieveableMaxRPMFraction(1);
+        outtakeMotor.setMotorType(mc);
+        outtakeMotor.setDirection(DcMotorEx.Direction.FORWARD);
 //        outtakeMotor.setPIDFCoefficients();
-        outtakeMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        outtakeMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(50,0,0,0));
-        outtakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        outtakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        outtakeMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(50,0,0,0));
+        outtakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         outtakeFollower = hardwareMap.get(DcMotorEx.class, RobotConstants.Outtake.outtakeFollower);
+        mc = outtakeFollower.getMotorType().clone();
+        mc.setAchieveableMaxRPMFraction(1);
+        outtakeFollower.setMotorType(mc);
         outtakeFollower.setMode(outtakeMotor.getMode());
-        outtakeFollower.setPIDFCoefficients(outtakeMotor.getMode(), outtakeMotor.getPIDFCoefficients(outtakeMotor.getMode()));
+//        outtakeFollower.setPIDFCoefficients(outtakeMotor.getMode(), outtakeMotor.getPIDFCoefficients(outtakeMotor.getMode()));
         outtakeFollower.setZeroPowerBehavior(outtakeMotor.getZeroPowerBehavior());
         outtakeFollower.setDirection(outtakeMotor.getDirection().inverted());
         feederMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Outtake.feeder);
@@ -140,7 +147,6 @@ public class RobotHardware {
 
         // ******************* TURRET ******************* //
         turretServo = hardwareMap.get(CRServo.class, "turretServo");
-        turretServo.resetDeviceConfigurationForOpMode();
         turretEncoder = hardwareMap.get(AnalogInput.class, "turretEncoder");
 
         // ******************* LIMELIGHT ******************* //
@@ -153,14 +159,17 @@ public class RobotHardware {
         drivetrain = new MecanumDrive();
         intake = new Intake();
         outtake = new Outtake();
-        turret = new Turret();
+        outtake.register();
+        turret = new Turret(Turret.Direction.REVERSE);
+        turret.register();
+        turret.forceResetTotalRotation();
         limelight = new Limelight();
         limelight.updateLimelightPose(
-                RobotConstants.Limelight.axisForward+RobotConstants.Limelight.rotRadius,
+                RobotConstants.Limelight.axisForward-RobotConstants.Limelight.rotRadius,
                 RobotConstants.Limelight.axisRight,
                 RobotConstants.Limelight.axisUp,
-                180,
-                18,
+                0,
+                15,
                 0
                 );
 

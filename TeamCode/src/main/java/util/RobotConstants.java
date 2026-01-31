@@ -22,18 +22,21 @@ public class RobotConstants {
         public static String feeder = "feederMotor"; // 1e
         public static double feederVelocity = Math.PI*2;
         //The only one that actually does anything (degree ticks per second)
-        public static double outtakeVelocityShort = Math.PI*0.85; // 0.0375 // (500/60.0)*28;
-        public static double outtakeVelocityLong = Math.PI*1.18; // 0.0435
-        public static double kP = 0.004;
+        public static double outtakeVelocityShort = 1200; // 2325; // Math.PI*0.85; // 0.0375 // (500/60.0)*28;
+//        public static double outtakeVelocityShort = Math.PI*0.85;;
+        public static double outtakeVelocityLong = 1400; // 2600;// Math.PI*1.18; // 0.0435
+//        public static double outtakeVelocityLong = Math.PI*1.18;;
+        public static double kP = 0.007;
         public static double kI = 0.000001;
         public static double kD = 0;
-        public static double kS = 0.05;
-        public static double kV = 0.0003;
+        public static double kS = 0.07;
+        public static double kV = 0.00037; // 1/4760
         public static double kA = 0;
         public static double maxI = 0.3;
         public static double maxAccel = 15000; // ticks/s^2
     }
 
+    @Configurable
     public static class Turret {
         // Analog 0, Servo 0
 //        public static double maxServoPos = Math.PI;
@@ -46,9 +49,14 @@ public class RobotConstants {
         public static double scoreBlueX = 0;
         public static double scoreBlueY = 141.0;
         public static double gearRatio = 29.0/120.0;
-        public static double kP = 0.015;
-        public static double kI = 0.0005;
-        public static double kD = 0.0025;
+        public static double maxAngle = 30;
+        public static double minAngle = -150;
+        public static double turretSpeed = 20;
+        public static double kP = 0.002; // 0.006 // 0.015;
+        public static double kI = 0.01967213;
+        public static double kD = 0.0004575;
+        public static double kS = 0;
+        public static double maxI = 0.3;
     }
 
     public static class Limelight {

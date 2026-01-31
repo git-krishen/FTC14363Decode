@@ -46,7 +46,7 @@ public class Limelight implements Subsystem {
     }
 
     public boolean hasTarget() {
-        return getTagIDList().contains(targetID);
+        return getTagIDList().contains(targetID.orElse(-1));
     }
 
     public boolean hasTag(int id) {
@@ -91,7 +91,7 @@ public class Limelight implements Subsystem {
     public Optional<Pose> getRobotPose() {
         List<FiducialResult> list = getFiducialList();
         if (list == null || list.isEmpty()) return Optional.empty();
-        Pose3D rawPose = list.getFirst().getRobotPoseFieldSpace();
+        Pose3D rawPose = list.get(0).getRobotPoseFieldSpace();
         Pose pose = new Pose(rawPose.getPosition().x, rawPose.getPosition().y, rawPose.getOrientation().getYaw(AngleUnit.DEGREES));
         return Optional.of(pose);
     }
@@ -176,8 +176,8 @@ public class Limelight implements Subsystem {
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
             connection.setRequestProperty("Content-Type", "application/json");
-            connection.setReadTimeout(15000);
-            connection.setConnectTimeout(100);
+            connection.setReadTimeout(50);
+            connection.setConnectTimeout(50);
 
             if (data != null) {
                 try (OutputStream os = connection.getOutputStream()) {
@@ -210,8 +210,8 @@ public class Limelight implements Subsystem {
             URL url = new URL(urlString);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
-            connection.setReadTimeout(100);
-            connection.setConnectTimeout(100);
+            connection.setReadTimeout(50);
+            connection.setConnectTimeout(50);
 
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {

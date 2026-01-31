@@ -15,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 import subsystems.Intake;
@@ -50,25 +51,42 @@ public class TeleopBase extends CommandOpMode {
         this.turret = robot.turret;
         this.limelight = robot.limelight;
         // Would add telemetry here
+//        Pose llPose = robot.limelight.getRobotPose().orElse(new Pose());
+//        robot.telemetryManager.debug("x" + " " + robot.follower.getPose().getX() + " | " + llPose.getX());
+//        robot.telemetryManager.debug("y" + " " + robot.follower.getPose().getY() + " | " + llPose.getY());
+//        robot.telemetryManager.debug("heading" + " " + robot.follower.getPose().getHeading() + " | " + llPose.getHeading());
+//        robot.telemetryManager.debug("llRobotPose" + " " + Arrays.toString(limelight.getOrientationArrayString()));
+//        robot.telemetryManager.debug("turret" + " " + turret.getDebugInfo());
+//        robot.telemetryManager.debug("outtakeVel" + " " + outtake.getOuttakeVelocity());
+//        robot.telemetryManager.debug("maxRPMFrac" + " " + robot.outtakeMotor.getMotorType().getAchieveableMaxRPMFraction());
+//        robot.telemetryManager.update();
 
         configureBindings();
     }
 
     @Override
     public void run() {
-        Pose llPose = robot.limelight.getRobotPose().orElse(new Pose());
+//        Pose llPose = robot.limelight.getRobotPose().orElse(new Pose());
+//        robot.telemetryManager.addData("x", robot.follower.getPose().getX() + " | " + llPose.getX());
+//        robot.telemetryManager.addData("y", robot.follower.getPose().getY() + " | " + llPose.getY());
+//        robot.telemetryManager.addData("heading", robot.follower.getPose().getHeading() + " | " + llPose.getHeading());
+//        robot.telemetryManager.addData("llRobotPose", Arrays.toString(limelight.getOrientationArrayString()));
+        robot.telemetryManager.addData("turret", turret.getDebugInfo());
+        robot.telemetryManager.addData("outtakeVel", outtake.getOuttakeVelocity());
+        robot.telemetryManager.addData("maxRPMFrac", robot.outtakeMotor.getMotorType().getAchieveableMaxRPMFraction());
+//        robot.telemetryManager.debug("x" + " " + robot.follower.getPose().getX() + " | " + llPose.getX());
+//        robot.telemetryManager.debug("y" + " " + robot.follower.getPose().getY() + " | " + llPose.getY());
+//        robot.telemetryManager.debug("heading" + " " + robot.follower.getPose().getHeading() + " | " + llPose.getHeading());
+//        robot.telemetryManager.debug("llRobotPose" + " " + Arrays.toString(limelight.getOrientationArrayString()));
+        robot.telemetryManager.debug("turret" + " " + turret.getDebugInfo());
+        robot.telemetryManager.debug("outtakeVel" + " " + outtake.getOuttakeVelocity());
+        robot.telemetryManager.debug("maxRPMFrac" + " " + robot.outtakeMotor.getMotorType().getAchieveableMaxRPMFraction());
+        robot.telemetryManager.update();
         CommandScheduler.getInstance().run();
         robot.follower.update();
-        robot.telemetryManager.addData("x", robot.follower.getPose().getX() + " | " + llPose.getX());
-        robot.telemetryManager.addData("y", robot.follower.getPose().getY() + " | " + llPose.getY());
-        robot.telemetryManager.addData("heading", robot.follower.getPose().getHeading() + " | " + llPose.getHeading());
-        robot.telemetryManager.addData("llRobotPose", Arrays.toString(limelight.getOrientationArrayString()));
-        robot.telemetryManager.addData("turret", turret.getCurrentAngle());
-        robot.telemetryManager.update();
     }
 
     private void configureBindings() {
-        robot.telemetryManager.debug(String.format("%f %f %f", driver.getLeftY(), driver.getLeftX(), driver.getRightX()));
         drivetrain.setDefaultCommand(new RunCommand(() -> {
             double ly = Math.abs(driver.getLeftY()) > 0.15 ? driver.getLeftY() : 0;
             double lx = Math.abs(driver.getLeftX()) > 0.15 ? driver.getLeftX() : 0;
@@ -80,23 +98,23 @@ public class TeleopBase extends CommandOpMode {
             );
         }, drivetrain));
 
-        turret.setDefaultCommand(
-                new RunCommand(() -> {
-                    double angle = turret.getCurrentAngle()+180;
-                    double forward = RobotConstants.Limelight.axisForward + Math.cos(Math.toRadians(angle));
-                    double right = RobotConstants.Limelight.axisRight + Math.sin(Math.toRadians(angle));
-                    double up = RobotConstants.Limelight.axisUp;
-                    limelight.updateLimelightPose(
-                            forward,
-                            right,
-                            up,
-                            angle,
-                            18,
-                            0
-                    );
-                    turret.lockToAprilTag();
-                })
-        );
+//        turret.setDefaultCommand(
+//                new RunCommand(() -> {
+//                    double angle = turret.getTotalRotationTurret();
+//                    double forward = RobotConstants.Limelight.axisForward + Math.cos(Math.toRadians(angle))*RobotConstants.Limelight.rotRadius;
+//                    double right = RobotConstants.Limelight.axisRight + Math.sin(Math.toRadians(angle))*RobotConstants.Limelight.rotRadius;
+//                    double up = RobotConstants.Limelight.axisUp;
+//                    limelight.updateLimelightPose(
+//                            forward,
+//                            right,
+//                            up,
+//                            angle,
+//                            15,
+//                            0
+//                    );
+////                    turret.lockToAprilTag();
+//                }, turret)
+//        );
 
         driver.getGamepadButton(GamepadKeys.Button.START).whenPressed(
                 new InstantCommand(() -> {
@@ -112,16 +130,11 @@ public class TeleopBase extends CommandOpMode {
 //                new InstantCommand(() -> turret.setPosition(turret.getPosition()+0.01))
 //        );
 
-        turret.setDefaultCommand(new RunCommand(() -> turret.lockToAprilTag(), turret));
         driver2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whileHeld(
-                new InstantCommand(() -> turret.changeTargetRotation(-1))
+                new InstantCommand(() -> turret.changeTargetRotation(RobotConstants.Turret.turretSpeed), turret)
         );
         driver2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whileHeld(
-                new InstantCommand(() -> turret.changeTargetRotation(1))
-        );
-
-        driver2.getGamepadButton(GamepadKeys.Button.A).whenPressed(
-                new InstantCommand(() -> turret.setTargetRotation(0))
+                new InstantCommand(() -> turret.changeTargetRotation(-RobotConstants.Turret.turretSpeed), turret)
         );
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(
@@ -173,7 +186,7 @@ public class TeleopBase extends CommandOpMode {
                 double triggerVal = driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
                 if (!triggered && triggerVal>0.3) {
                     double curr = intake.getIntakePower();
-                    intake.setIntakePower(curr>0.1 ? 0 : 1);
+                    intake.setIntakePower(curr>0.1 ? 0 : 0.8);
                     triggered = true;
                 } else if (triggered && triggerVal<0.3) {
                     triggered = false;
@@ -193,10 +206,26 @@ public class TeleopBase extends CommandOpMode {
         intake.setDefaultCommand(triggerCommand);
 
         driver.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whenHeld(
-                new StartEndCommand(
-                        () -> outtake.setFeederPower(1),
-                        () -> outtake.stopFeederMotor()
-                )
+                new Command() {
+                    @Override
+                    public void execute() {
+                        if (driver.getGamepadButton(GamepadKeys.Button.A).get()) {
+                            outtake.setFeederPower(0.8);
+                        } else {
+                            outtake.setFeederPower(1);
+                        }
+                    }
+
+                    @Override
+                    public void end(boolean interrupted) {
+                        outtake.stopFeederMotor();
+                    }
+
+                    @Override
+                    public Set<Subsystem> getRequirements() {
+                        return new HashSet<>();
+                    }
+                }
         );
 
         driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenHeld(

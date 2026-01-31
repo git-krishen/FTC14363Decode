@@ -30,7 +30,7 @@ public class Outtake implements Subsystem {
     }
 
     public double getOuttakeVelocity() {
-        return robot.outtakeMotor.getVelocity(AngleUnit.RADIANS);
+        return (robot.outtakeMotor.getVelocity() + robot.outtakeFollower.getVelocity()) / 2.0;
     }
 
     public void setOuttakeVelocity(double speed) {
@@ -67,8 +67,7 @@ public class Outtake implements Subsystem {
     }
 
     public void stopOuttakeMotor() {
-        robot.outtakeMotor.setVelocity(0);
-        robot.outtakeFollower.setVelocity(0);
+        targetVelocity = 0;
     }
 
     public void stopFeederMotor() {

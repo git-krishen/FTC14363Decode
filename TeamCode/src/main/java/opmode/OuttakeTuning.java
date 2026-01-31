@@ -47,10 +47,11 @@ public class OuttakeTuning extends CommandOpMode {
         driver2 = new GamepadEx(gamepad2);
         robot.init(hardwareMap, driver);
 
-        drivetrain = new MecanumDrive();
-        intake = new Intake();
-        outtake = new Outtake();
-        turret = new Turret();
+        drivetrain = robot.drivetrain;
+        intake = robot.intake;
+        outtake = robot.outtake;
+        turret = robot.turret;
+        turret.setRtp(false);
         // Would add telemetry here
 
         configureBindings();
@@ -66,8 +67,14 @@ public class OuttakeTuning extends CommandOpMode {
     }
 
     private void configureBindings() {
-        outtake.setDefaultCommand(
-                new RunCommand(() -> outtake.setOuttakePower(targetPower))
+//        outtake.setDefaultCommand(
+//                new RunCommand(() -> outtake.setOuttakePower(targetPower), outtake)
+//        );
+        driver2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenHeld(
+                new StartEndCommand(
+                        () -> turret.setPower(RobotConstants.Turret.kS),
+                        () -> turret.setPower(0)
+                )
         );
     }
 }
