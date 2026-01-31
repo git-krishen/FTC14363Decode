@@ -10,6 +10,6 @@ public class TeleopRed extends TeleopBase {
     @Override
     public void initialize() {
         super.initialize();
-        RobotHardware.getInstance().limelight.setTargetID(24);
+//        RobotHardware.getInstance().limelight.setTargetID(24);
     }
 }

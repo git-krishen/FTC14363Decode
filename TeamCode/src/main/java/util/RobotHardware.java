@@ -133,7 +133,7 @@ public class RobotHardware {
 //        outtakeMotor.setPIDFCoefficients();
         outtakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //        outtakeMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(50,0,0,0));
-        outtakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        outtakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         outtakeFollower = hardwareMap.get(DcMotorEx.class, RobotConstants.Outtake.outtakeFollower);
         mc = outtakeFollower.getMotorType().clone();
         mc.setAchieveableMaxRPMFraction(1);
@@ -150,28 +150,28 @@ public class RobotHardware {
         turretEncoder = hardwareMap.get(AnalogInput.class, "turretEncoder");
 
         // ******************* LIMELIGHT ******************* //
-        ll = hardwareMap.get(Limelight3A.class, "limelight");
-        ll.setPollRateHz(100);
-        ll.pipelineSwitch(9);
-        ll.updateRobotOrientation(0);
-        ll.start();
+//        ll = hardwareMap.get(Limelight3A.class, "limelight");
+//        ll.setPollRateHz(100);
+//        ll.pipelineSwitch(9);
+//        ll.updateRobotOrientation(0);
+//        ll.start();
 
         drivetrain = new MecanumDrive();
         intake = new Intake();
         outtake = new Outtake();
         outtake.register();
-        turret = new Turret(Turret.Direction.REVERSE);
-        turret.register();
-        turret.forceResetTotalRotation();
-        limelight = new Limelight();
-        limelight.updateLimelightPose(
-                RobotConstants.Limelight.axisForward-RobotConstants.Limelight.rotRadius,
-                RobotConstants.Limelight.axisRight,
-                RobotConstants.Limelight.axisUp,
-                0,
-                15,
-                0
-                );
+        turret = new Turret();
+//        turret.register();
+//        turret.forceResetTotalRotation();
+//        limelight = new Limelight();
+//        limelight.updateLimelightPose(
+//                RobotConstants.Limelight.axisForward-RobotConstants.Limelight.rotRadius,
+//                RobotConstants.Limelight.axisRight,
+//                RobotConstants.Limelight.axisUp,
+//                0,
+//                15,
+//                0
+//                );
 
         // ******************* CAMERA ******************* //
 //        WebcamName webcam = hardwareMap.get(WebcamName.class, "webcam1");

@@ -23,7 +23,7 @@ public class AutonRedClose extends OpMode {
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
-    private Pose startPose = new Pose(120,120,0);
+    private Pose startPose = new Pose(122,122,0);
 
     // Paths
     private PathChain Path1, Path2, Path3, Path4, Path5, Path6, Path7, Path8;
@@ -35,11 +35,12 @@ public class AutonRedClose extends OpMode {
     public void buildPaths() {
         Path1 = follower.pathBuilder().addPath(
                         new BezierLine(
-                                new Pose(120.000, 120.000),
+                                new Pose(122.000, 122.000),
 
                                 new Pose(85.000, 85.000)
                         )
                 ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                .setVelocityConstraint(40)
 
                 .build();
 
@@ -109,7 +110,7 @@ public class AutonRedClose extends OpMode {
                         new BezierLine(
                                 new Pose(85.000, 85.000),
 
-                                new Pose(85.000, 60.000)
+                                new Pose(90.000, 60.000)
                         )
                 ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
 
@@ -122,17 +123,18 @@ public class AutonRedClose extends OpMode {
                 if (!follower.isBusy() && pathTimer.getElapsedTime() < 250) {
                     follower.followPath(Path1, true);
                     outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityShort);
-                } else if (pathTimer.getElapsedTime() < 2750) {
+                } else if (pathTimer.getElapsedTime() < 250+2500) {
 
-                } else if (pathTimer.getElapsedTime() < 2750+1500) {
-                    intake.setIntakeMotorVelocity(RobotConstants.Intake.intakeVelocity);
-                    outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
+                } else if (pathTimer.getElapsedTime() < 250+2500+2000) {
+                    intake.setIntakePower(0.8);
+                    outtake.setFeederPower(0.8);
                 } else {
                     outtake.stopMotors();
                     setPathState(1);
                 }
                 break;
             case 1:
+                outtake.stopOuttakeMotor();
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
                     intake.setIntakePower(1);
@@ -142,75 +144,81 @@ public class AutonRedClose extends OpMode {
                 }
                 break;
             case 2:
+                handleIntake(1000,25);
                 if(!follower.isBusy()) {
                     follower.followPath(Path3);
                     setPathState(3);
                 }
                 break;
             case 3:
-                if (follower.isBusy()) {
-                    outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityShort);
-                } else if (pathTimer.getElapsedTime() < 2000) {
+                if (pathTimer.getElapsedTime() < 1000) {
 
-                } else if (pathTimer.getElapsedTime() < 2000+1500) {
-                    intake.setIntakeMotorVelocity(RobotConstants.Intake.intakeVelocity);
-                    outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
+                } else if (pathTimer.getElapsedTime() < 2500) {
+                    intake.stopMotor();
+                    outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityShort);
+                } else if (pathTimer.getElapsedTime() < 2500+2000) {
+                    intake.setIntakePower(0.8);
+                    outtake.setFeederPower(0.8);
                 } else {
                     outtake.stopMotors();
                     setPathState(4);
                 }
                 break;
             case 4:
+                outtake.stopOuttakeMotor();
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
-                    intake.setIntakePower(1);
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
                     follower.followPath(Path4);
                     setPathState(5);
                 }
                 break;
             case 5:
+                handleIntake(2000,25);
                 if(!follower.isBusy()) {
                     follower.followPath(Path5);
                     setPathState(6);
                 }
                 break;
             case 6:
-                if (follower.isBusy()) {
-                    outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityShort*1.05);
-                } else if (pathTimer.getElapsedTime() < 2500) {
+                if (pathTimer.getElapsedTime() < 1000) {
 
+                } else if (pathTimer.getElapsedTime() < 2500) {
+                    intake.stopMotor();
+                    outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityShort);
                 } else if (pathTimer.getElapsedTime() < 2500+2000) {
-                    intake.setIntakeMotorVelocity(RobotConstants.Intake.intakeVelocity);
-                    outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
+                    intake.setIntakePower(0.8);
+                    outtake.setFeederPower(0.8);
                 } else {
                     outtake.stopMotors();
                     setPathState(7);
                 }
                 break;
             case 7:
+                outtake.stopOuttakeMotor();
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
-                    intake.setIntakePower(1);
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
                     follower.followPath(Path6);
                     setPathState(8);
                 }
                 break;
             case 8:
+                handleIntake(2500,25);
                 if(!follower.isBusy()) {
                     follower.followPath(Path7);
                     setPathState(9);
                 }
                 break;
             case 9:
-                if (follower.isBusy()) {
-                    outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityShort*1.05);
-                } else if (pathTimer.getElapsedTime() < 3000) {
+                if (pathTimer.getElapsedTime() < 3000) {
 
-                } else if (pathTimer.getElapsedTime() < 3000+2000) {
-                    intake.setIntakeMotorVelocity(RobotConstants.Intake.intakeVelocity);
-                    outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
+                } else if (pathTimer.getElapsedTime() < 3500) {
+                    intake.stopMotor();
+                    outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityShort);
+                } else if (pathTimer.getElapsedTime() < 3500+2000) {
+                    intake.setIntakePower(0.8);
+                    outtake.setFeederPower(0.8);
                 } else {
                     outtake.stopMotors();
                     follower.followPath(Path8);
@@ -221,6 +229,7 @@ public class AutonRedClose extends OpMode {
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(!follower.isBusy()) {
                     intake.stopMotor();
+                    outtake.stopOuttakeMotor();
                     /* Set the state to a Case we won't use or define, so it just stops running an new paths */
                     setPathState(-1);
                 }
@@ -265,18 +274,18 @@ public class AutonRedClose extends OpMode {
         if (pathTimer.getElapsedTime() < startDelay) {
 
         } else if (pathTimer.getElapsedTime() < startDelay+shotOneTiming) {
-            outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
+            outtake.setFeederPower(0.8);
         } else if (pathTimer.getElapsedTime() < startDelay+shotOneTiming+shotTwoDelay) {
             outtake.stopFeederMotor();
         } else if (pathTimer.getElapsedTime() < startDelay+shotOneTiming+shotTwoDelay+shotTwoTiming) {
-            outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
-            intake.setIntakeMotorVelocity(RobotConstants.Intake.intakeVelocity);
+            outtake.setFeederPower(0.8);
+            intake.setIntakePower(0.8);
         } else if (pathTimer.getElapsedTime() < startDelay+shotOneTiming+shotTwoDelay+shotTwoTiming+shotThreeDelay) {
             intake.stopMotor();
             outtake.stopFeederMotor();
         } else if (pathTimer.getElapsedTime() < startDelay+shotOneTiming+shotTwoDelay+shotTwoTiming+shotThreeDelay+shotThreeTiming) {
-            outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
-            intake.setIntakeMotorVelocity(RobotConstants.Intake.intakeVelocity);
+            outtake.setFeederPower(0.8);
+            intake.setIntakePower(0.8);
         } else {
             outtake.stopOuttakeMotor();
             outtake.stopFeederMotor();
@@ -288,13 +297,11 @@ public class AutonRedClose extends OpMode {
     private void handleIntake(int intakeTime, int reverseTime) {
         if (pathTimer.getElapsedTime() < intakeTime) {
             intake.setIntakePower(1);
-            outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
         } else if (pathTimer.getElapsedTime() < intakeTime+reverseTime) {
-            outtake.setFeederVelocity(-RobotConstants.Outtake.feederVelocity);
+            outtake.setFeederVelocity(0.8);
         } else if (follower.getPathCompletion() < 1) {
             outtake.stopFeederMotor();
         } else {
-            intake.stopMotor();
         }
     }
 
@@ -317,9 +324,11 @@ public class AutonRedClose extends OpMode {
         telemetry.addData("x", follower.getPose().getX() + " | " + follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY() + " | " + follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
+        telemetry.addData("outtakeSpeed", outtake.getOuttakeVelocity() + " " + outtake.getTargetVelocity());
         telemetry.update();
 
         follower.update();
+        outtake.periodic();
         autonomousPathUpdate();
     }
 

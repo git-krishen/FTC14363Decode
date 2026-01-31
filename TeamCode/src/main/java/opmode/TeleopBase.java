@@ -71,14 +71,14 @@ public class TeleopBase extends CommandOpMode {
 //        robot.telemetryManager.addData("y", robot.follower.getPose().getY() + " | " + llPose.getY());
 //        robot.telemetryManager.addData("heading", robot.follower.getPose().getHeading() + " | " + llPose.getHeading());
 //        robot.telemetryManager.addData("llRobotPose", Arrays.toString(limelight.getOrientationArrayString()));
-        robot.telemetryManager.addData("turret", turret.getDebugInfo());
+//        robot.telemetryManager.addData("turret", turret.getDebugInfo());
         robot.telemetryManager.addData("outtakeVel", outtake.getOuttakeVelocity());
         robot.telemetryManager.addData("maxRPMFrac", robot.outtakeMotor.getMotorType().getAchieveableMaxRPMFraction());
 //        robot.telemetryManager.debug("x" + " " + robot.follower.getPose().getX() + " | " + llPose.getX());
 //        robot.telemetryManager.debug("y" + " " + robot.follower.getPose().getY() + " | " + llPose.getY());
 //        robot.telemetryManager.debug("heading" + " " + robot.follower.getPose().getHeading() + " | " + llPose.getHeading());
 //        robot.telemetryManager.debug("llRobotPose" + " " + Arrays.toString(limelight.getOrientationArrayString()));
-        robot.telemetryManager.debug("turret" + " " + turret.getDebugInfo());
+//        robot.telemetryManager.debug("turret" + " " + turret.getDebugInfo());
         robot.telemetryManager.debug("outtakeVel" + " " + outtake.getOuttakeVelocity());
         robot.telemetryManager.debug("maxRPMFrac" + " " + robot.outtakeMotor.getMotorType().getAchieveableMaxRPMFraction());
         robot.telemetryManager.update();
@@ -131,10 +131,16 @@ public class TeleopBase extends CommandOpMode {
 //        );
 
         driver2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whileHeld(
-                new InstantCommand(() -> turret.changeTargetRotation(RobotConstants.Turret.turretSpeed), turret)
+                new StartEndCommand(
+                        () -> turret.setPower(-1),
+                        () -> turret.stopTurret()
+                )
         );
         driver2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whileHeld(
-                new InstantCommand(() -> turret.changeTargetRotation(-RobotConstants.Turret.turretSpeed), turret)
+                new StartEndCommand(
+                        () -> turret.setPower(1),
+                        () -> turret.stopTurret()
+                )
         );
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(

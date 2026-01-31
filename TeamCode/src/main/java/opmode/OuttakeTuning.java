@@ -51,7 +51,7 @@ public class OuttakeTuning extends CommandOpMode {
         intake = robot.intake;
         outtake = robot.outtake;
         turret = robot.turret;
-        turret.setRtp(false);
+//        turret.setRtp(false);
         // Would add telemetry here
 
         configureBindings();

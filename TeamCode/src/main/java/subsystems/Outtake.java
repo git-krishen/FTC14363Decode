@@ -33,6 +33,10 @@ public class Outtake implements Subsystem {
         return (robot.outtakeMotor.getVelocity() + robot.outtakeFollower.getVelocity()) / 2.0;
     }
 
+    public double getTargetVelocity() {
+        return targetVelocity;
+    }
+
     public void setOuttakeVelocity(double speed) {
         targetVelocity = speed;
     }
