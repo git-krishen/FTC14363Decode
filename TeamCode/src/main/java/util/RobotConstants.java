@@ -20,20 +20,22 @@ public class RobotConstants {
         public static String outtake = "outtakeMotor"; // 2e
         public static String outtakeFollower = "outtakeFollowMotor"; // 3e
         public static String feeder = "feederMotor"; // 1e
+        public static String distanceSensorFeed = "distanceSensorFeed"; // 3 i2c
+        public static String distanceSensorOut = "distanceSensorOut"; // 2 i2c
         public static double feederVelocity = Math.PI*2;
         //The only one that actually does anything (degree ticks per second)
         public static double outtakeVelocityShort = 1200; // 2325; // Math.PI*0.85; // 0.0375 // (500/60.0)*28;
 //        public static double outtakeVelocityShort = Math.PI*0.85;;
         public static double outtakeVelocityLong = 1400; // 2600;// Math.PI*1.18; // 0.0435
 //        public static double outtakeVelocityLong = Math.PI*1.18;;
-        public static double kP = 0.007;
-        public static double kI = 0.000001;
-        public static double kD = 0;
-        public static double kS = 0.07;
-        public static double kV = 0.00037; // 1/4760
+        public static double kP = 0.004; // 0.007;
+        public static double kI = 0.01; // 0.000001;
+        public static double kD = 0.00005; // 0
+        public static double kS = 0.07; // 0.07;
+        public static double kV = 0.00067; // 0.00037; // 1/4760
         public static double kA = 0;
         public static double maxI = 0.3;
-        public static double maxAccel = 15000; // ticks/s^2
+        public static double maxAccel = 30000; // 15000; // ticks/s^2
     }
 
     @Configurable

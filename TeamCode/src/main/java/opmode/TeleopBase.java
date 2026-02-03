@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import subsystems.Intake;
-import subsystems.Limelight;
 import subsystems.MecanumDrive;
 import subsystems.Outtake;
 import subsystems.Turret;
@@ -34,7 +33,6 @@ public class TeleopBase extends CommandOpMode {
     private Intake intake;
     private Outtake outtake;
     private Turret turret;
-    private Limelight limelight;
     // Maybe I need to set states here???
 
 
@@ -49,38 +47,18 @@ public class TeleopBase extends CommandOpMode {
         this.intake = robot.intake;
         this.outtake = robot.outtake;
         this.turret = robot.turret;
-        this.limelight = robot.limelight;
-        // Would add telemetry here
-//        Pose llPose = robot.limelight.getRobotPose().orElse(new Pose());
-//        robot.telemetryManager.debug("x" + " " + robot.follower.getPose().getX() + " | " + llPose.getX());
-//        robot.telemetryManager.debug("y" + " " + robot.follower.getPose().getY() + " | " + llPose.getY());
-//        robot.telemetryManager.debug("heading" + " " + robot.follower.getPose().getHeading() + " | " + llPose.getHeading());
-//        robot.telemetryManager.debug("llRobotPose" + " " + Arrays.toString(limelight.getOrientationArrayString()));
-//        robot.telemetryManager.debug("turret" + " " + turret.getDebugInfo());
-//        robot.telemetryManager.debug("outtakeVel" + " " + outtake.getOuttakeVelocity());
-//        robot.telemetryManager.debug("maxRPMFrac" + " " + robot.outtakeMotor.getMotorType().getAchieveableMaxRPMFraction());
-//        robot.telemetryManager.update();
 
         configureBindings();
     }
 
     @Override
     public void run() {
-//        Pose llPose = robot.limelight.getRobotPose().orElse(new Pose());
-//        robot.telemetryManager.addData("x", robot.follower.getPose().getX() + " | " + llPose.getX());
-//        robot.telemetryManager.addData("y", robot.follower.getPose().getY() + " | " + llPose.getY());
-//        robot.telemetryManager.addData("heading", robot.follower.getPose().getHeading() + " | " + llPose.getHeading());
-//        robot.telemetryManager.addData("llRobotPose", Arrays.toString(limelight.getOrientationArrayString()));
+        robot.telemetryManager.addData("x", robot.follower.getPose().getX());
+        robot.telemetryManager.addData("y", robot.follower.getPose().getY());
+        robot.telemetryManager.addData("heading", robot.follower.getPose().getHeading());
 //        robot.telemetryManager.addData("turret", turret.getDebugInfo());
         robot.telemetryManager.addData("outtakeVel", outtake.getOuttakeVelocity());
         robot.telemetryManager.addData("maxRPMFrac", robot.outtakeMotor.getMotorType().getAchieveableMaxRPMFraction());
-//        robot.telemetryManager.debug("x" + " " + robot.follower.getPose().getX() + " | " + llPose.getX());
-//        robot.telemetryManager.debug("y" + " " + robot.follower.getPose().getY() + " | " + llPose.getY());
-//        robot.telemetryManager.debug("heading" + " " + robot.follower.getPose().getHeading() + " | " + llPose.getHeading());
-//        robot.telemetryManager.debug("llRobotPose" + " " + Arrays.toString(limelight.getOrientationArrayString()));
-//        robot.telemetryManager.debug("turret" + " " + turret.getDebugInfo());
-        robot.telemetryManager.debug("outtakeVel" + " " + outtake.getOuttakeVelocity());
-        robot.telemetryManager.debug("maxRPMFrac" + " " + robot.outtakeMotor.getMotorType().getAchieveableMaxRPMFraction());
         robot.telemetryManager.update();
         CommandScheduler.getInstance().run();
         robot.follower.update();
@@ -97,24 +75,6 @@ public class TeleopBase extends CommandOpMode {
                     rx
             );
         }, drivetrain));
-
-//        turret.setDefaultCommand(
-//                new RunCommand(() -> {
-//                    double angle = turret.getTotalRotationTurret();
-//                    double forward = RobotConstants.Limelight.axisForward + Math.cos(Math.toRadians(angle))*RobotConstants.Limelight.rotRadius;
-//                    double right = RobotConstants.Limelight.axisRight + Math.sin(Math.toRadians(angle))*RobotConstants.Limelight.rotRadius;
-//                    double up = RobotConstants.Limelight.axisUp;
-//                    limelight.updateLimelightPose(
-//                            forward,
-//                            right,
-//                            up,
-//                            angle,
-//                            15,
-//                            0
-//                    );
-////                    turret.lockToAprilTag();
-//                }, turret)
-//        );
 
         driver.getGamepadButton(GamepadKeys.Button.START).whenPressed(
                 new InstantCommand(() -> {
@@ -192,7 +152,7 @@ public class TeleopBase extends CommandOpMode {
                 double triggerVal = driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
                 if (!triggered && triggerVal>0.3) {
                     double curr = intake.getIntakePower();
-                    intake.setIntakePower(curr>0.1 ? 0 : 0.8);
+                    intake.setIntakePower(curr>0.1 ? 0 : 1);
                     triggered = true;
                 } else if (triggered && triggerVal<0.3) {
                     triggered = false;

@@ -4,10 +4,12 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
@@ -60,6 +62,10 @@ public class RobotHardware {
 
     // Color Sensor
 //    public ColorSensor colorSensor;
+
+    // Distance Sensors
+    public DistanceSensor intakeDistanceSensor;
+    public DistanceSensor outtakeDistanceSensor;
 
     // Subsystems
     public Intake intake;
@@ -145,16 +151,19 @@ public class RobotHardware {
         feederMotor = hardwareMap.get(DcMotorEx.class, RobotConstants.Outtake.feeder);
         feederMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        intakeDistanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, RobotConstants.Outtake.distanceSensorFeed);
+        outtakeDistanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, RobotConstants.Outtake.distanceSensorOut);
+
         // ******************* TURRET ******************* //
         turretServo = hardwareMap.get(CRServo.class, "turretServo");
         turretEncoder = hardwareMap.get(AnalogInput.class, "turretEncoder");
 
         // ******************* LIMELIGHT ******************* //
-//        ll = hardwareMap.get(Limelight3A.class, "limelight");
-//        ll.setPollRateHz(100);
-//        ll.pipelineSwitch(9);
-//        ll.updateRobotOrientation(0);
-//        ll.start();
+        ll = hardwareMap.get(Limelight3A.class, "limelight");
+        ll.setPollRateHz(100);
+        ll.pipelineSwitch(9);
+        ll.updateRobotOrientation(0);
+        ll.start();
 
         drivetrain = new MecanumDrive();
         intake = new Intake();

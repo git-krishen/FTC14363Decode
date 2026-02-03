@@ -26,6 +26,7 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.stream.Collectors;
 
+import util.RobotConstants;
 import util.RobotHardware;
 
 public class Limelight implements Subsystem {
@@ -244,18 +245,20 @@ public class Limelight implements Subsystem {
 
     @Override
     public void periodic() {
-//        LLResult result = robot.limelight.getLatestResult();
-//        double robotYaw = robot.odo.getHeading(AngleUnit.RADIANS);
-//        robot.limelight.updateRobotOrientation(robotYaw);
-//        if (result != null && result.isValid()) {
-//            Pose3D botPose = result.getBotpose_MT2();
-//            if (botPose != null) {
-//                double x = botPose.getPosition().x;
-//                double y = botPose.getPosition().y;
-//                double r = botPose.getOrientation().getYaw();
-//                Pose fieldPose = new Pose(x,y,r);
-//                robot.drivetrain.setCurrentPose(fieldPose);
-//            }
+//        double angle = robot.turret.getTotalRotationTurret();
+//        double forward = RobotConstants.Limelight.axisForward + Math.cos(Math.toRadians(angle))*RobotConstants.Limelight.rotRadius;
+//        double right = RobotConstants.Limelight.axisRight + Math.sin(Math.toRadians(angle))*RobotConstants.Limelight.rotRadius;
+//        double up = RobotConstants.Limelight.axisUp;
+//        updateLimelightPose(
+//                forward,
+//                right,
+//                up,
+//                angle,
+//                15,
+//                0
+//        );
+//        if (hasTarget()) {
+//            robot.turret.setTargetRotationTurret(getTotalRotationTurret()-(getTargetX().orElse(0)));
 //        }
     }
 }

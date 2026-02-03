@@ -64,9 +64,6 @@ public class MecanumDrive implements Subsystem {
     }
 
     public void drive(double ly, double lx, double rx) {
-//        robot.telemetryManager.addData("Drive", String.format("driving %f %f %f", ly, lx, rx));
-//        robot.telemetryManager.addData("Pose", "x: " + robot.follower.getPose().getX() + " | y: " + robot.follower.getPose().getY() + " | heading: " + robot.follower.getHeading());
-//        Limelight.setTargetID(20);
 
         if (ly != 0 && lx != 0 && robot.leftRear.getZeroPowerBehavior().equals(DcMotor.ZeroPowerBehavior.BRAKE)) {
             robot.leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -85,12 +82,6 @@ public class MecanumDrive implements Subsystem {
         double rotY = lx * Math.sin(-heading) + ly * Math.cos(-heading);
 
         rotX *= 1.1;
-
-//        if (rx == 0 && (Limelight.hasTag(20))) {
-//            rx = Math.clamp(pid.calculate(Math.toRadians(robot.odo.getHeading(AngleUnit.RADIANS)), Math.toRadians(robot.odo.getHeading(AngleUnit.RADIANS)-Limelight.getTargetX().orElse(
-//                    0
-//            ))), -1, 1);
-//        }
 
         double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
         leftFrontPower = (rotY + rotX + rx) / denominator;

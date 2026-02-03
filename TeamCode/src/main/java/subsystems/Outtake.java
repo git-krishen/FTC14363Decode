@@ -141,7 +141,7 @@ public class Outtake implements Subsystem {
 
         // ==================== TOTAL OUTPUT ====================
         double totalPower = ffOutput + pidOutput;
-        totalPower = Math.clamp(totalPower, 0, 1.0);  // Motor power range (flywheel only spins one direction)
+        totalPower = Math.clamp(totalPower, -1.0, 1.0);  // Motor power range (flywheel only spins one direction)
 
         // Apply power to both motors
         robot.outtakeMotor.setPower(totalPower);
