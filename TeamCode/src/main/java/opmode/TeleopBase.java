@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import subsystems.Intake;
+import subsystems.LEDIndicator;
 import subsystems.MecanumDrive;
 import subsystems.Outtake;
 import subsystems.Turret;
@@ -198,6 +199,8 @@ public class TeleopBase extends CommandOpMode {
                 new Command() {
                     @Override
                     public void execute() {
+                        LEDIndicator led = new LEDIndicator();
+                        led.turnOn();
                         if (driver.getGamepadButton(GamepadKeys.Button.A).get()) {
                             outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityLong);
                         } else {
