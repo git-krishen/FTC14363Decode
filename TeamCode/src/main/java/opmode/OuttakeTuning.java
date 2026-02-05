@@ -67,14 +67,14 @@ public class OuttakeTuning extends CommandOpMode {
     }
 
     private void configureBindings() {
-//        outtake.setDefaultCommand(
-//                new RunCommand(() -> outtake.setOuttakePower(targetPower), outtake)
-//        );
-        driver2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenHeld(
-                new StartEndCommand(
-                        () -> turret.setPower(RobotConstants.Turret.kS),
-                        () -> turret.setPower(0)
-                )
+        outtake.setDefaultCommand(
+                new RunCommand(() -> outtake.setOuttakePower(targetPower), outtake)
         );
+//        driver2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenHeld(
+//                new StartEndCommand(
+//                        () -> turret.setPower(RobotConstants.Turret.kS),
+//                        () -> turret.setPower(0)
+//                )
+//        );
     }
 }

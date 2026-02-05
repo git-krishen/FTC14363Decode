@@ -4,9 +4,9 @@ import com.arcrobotics.ftclib.command.Subsystem;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes.*;
-import com.qualcomm.hardware.limelightvision.LLStatus;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import util.RobotConstants;
@@ -32,17 +33,37 @@ import util.RobotHardware;
 public class Limelight implements Subsystem {
     private RobotHardware robot;
     private OptionalInt targetID;
+    private AtomicReference<String[]> latestOrientation = new AtomicReference<>(new String[]{"Initializing..."});
+    private final AtomicReference<Double[]> poseToUpdate = new AtomicReference<>(null);
 
     public Limelight() {
         robot = RobotHardware.getInstance();
         targetID = OptionalInt.empty();
+        new Thread(this::visionLoop).start();
+    }
+
+    public void visionLoop() {
+        while (!Thread.interrupted()) {
+            try {
+                Double[] pose = poseToUpdate.getAndSet(null);
+                if (pose != null && pose.length == 6) {
+                    updateLimelightPoseInternal(pose[0], pose[1], pose[2], pose[3], pose[4], pose[5]);
+                }
+
+                latestOrientation.set(getOrientationArrayStringInternal());
+
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
     }
 
     public void setTargetID(int id) {
         targetID = OptionalInt.of(id);
     }
 
-    public void setRobotYaw(double angle) {
+    public void setLimelightYaw(double angle) {
         robot.ll.updateRobotOrientation(angle);
     }
 
@@ -90,10 +111,9 @@ public class Limelight implements Subsystem {
     }
 
     public Optional<Pose> getRobotPose() {
-        List<FiducialResult> list = getFiducialList();
-        if (list == null || list.isEmpty()) return Optional.empty();
-        Pose3D rawPose = list.get(0).getRobotPoseFieldSpace();
-        Pose pose = new Pose(rawPose.getPosition().x, rawPose.getPosition().y, rawPose.getOrientation().getYaw(AngleUnit.DEGREES));
+        LLResult result = robot.ll.getLatestResult();
+        Pose3D rawPose = result.getBotpose_MT2();
+        Pose pose = new Pose(DistanceUnit.INCH.fromMeters(rawPose.getPosition().x), DistanceUnit.INCH.fromMeters(rawPose.getPosition().y), rawPose.getOrientation().getYaw(AngleUnit.DEGREES));
         return Optional.of(pose);
     }
 
@@ -116,7 +136,10 @@ public class Limelight implements Subsystem {
     }
 
     // Meters, degrees
-    public boolean updateLimelightPose(double forward, double side, double up, double yaw, double pitch, double roll) {
+    public void updateLimelightPose(double forward, double side, double up, double yaw, double pitch, double roll) {
+        poseToUpdate.set(new Double[]{forward, side, up, yaw, pitch, roll});
+    }
+    private boolean updateLimelightPoseInternal(double forward, double side, double up, double yaw, double pitch, double roll) {
         try {
             JSONObject pipelineUpdate = new JSONObject();
             double[] cameraPose = {forward, side, up, roll, pitch, yaw};
@@ -139,6 +162,10 @@ public class Limelight implements Subsystem {
     }
 
     public String[] getOrientationArrayString() {
+        return latestOrientation.get();
+    }
+
+    private String[] getOrientationArrayStringInternal() {
         JSONObject statusJson = sendGetRequest("/results");
         if(statusJson == null)
         {
@@ -177,8 +204,8 @@ public class Limelight implements Subsystem {
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
             connection.setRequestProperty("Content-Type", "application/json");
-            connection.setReadTimeout(50);
-            connection.setConnectTimeout(50);
+            connection.setReadTimeout(15000);
+            connection.setConnectTimeout(100);
 
             if (data != null) {
                 try (OutputStream os = connection.getOutputStream()) {
@@ -194,7 +221,6 @@ public class Limelight implements Subsystem {
                 //System.out.println("HTTP POST Error: " + responseCode);
             }
         } catch (Exception e) {
-            robot.telemetryManager.addData("error", e.toString());
         } finally {
             if (connection != null) {
                 connection.disconnect();
@@ -211,8 +237,8 @@ public class Limelight implements Subsystem {
             URL url = new URL(urlString);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
-            connection.setReadTimeout(50);
-            connection.setConnectTimeout(50);
+            connection.setReadTimeout(100);
+            connection.setConnectTimeout(100);
 
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
@@ -241,24 +267,5 @@ public class Limelight implements Subsystem {
         reader.close();
 
         return response.toString();
-    }
-
-    @Override
-    public void periodic() {
-//        double angle = robot.turret.getTotalRotationTurret();
-//        double forward = RobotConstants.Limelight.axisForward + Math.cos(Math.toRadians(angle))*RobotConstants.Limelight.rotRadius;
-//        double right = RobotConstants.Limelight.axisRight + Math.sin(Math.toRadians(angle))*RobotConstants.Limelight.rotRadius;
-//        double up = RobotConstants.Limelight.axisUp;
-//        updateLimelightPose(
-//                forward,
-//                right,
-//                up,
-//                angle,
-//                15,
-//                0
-//        );
-//        if (hasTarget()) {
-//            robot.turret.setTargetRotationTurret(getTotalRotationTurret()-(getTargetX().orElse(0)));
-//        }
     }
 }

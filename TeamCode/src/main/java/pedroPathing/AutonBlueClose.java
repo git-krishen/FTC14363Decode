@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import subsystems.Feeder;
 import subsystems.Intake;
 import subsystems.Outtake;
 import util.RobotConstants;
@@ -30,6 +31,7 @@ public class AutonBlueClose extends OpMode {
 
     private Intake intake;
     private Outtake outtake;
+    private Feeder feeder;
 
     // ctrl+f new Pose\((\d+\.?\d+), (\d+\.?\d+\)) replace reflect(new Pose\($1, $2\)
     public void buildPaths() {
@@ -128,9 +130,10 @@ public class AutonBlueClose extends OpMode {
 
                 } else if (pathTimer.getElapsedTime() < 250+2500+2000) {
                     intake.setIntakePower(0.8);
-                    outtake.setFeederPower(0.8);
+                    feeder.setFeederPower(0.8);
                 } else {
-                    outtake.stopMotors();
+                    outtake.stopOuttakeMotor();
+                    feeder.stopMotor();
                     setPathState(1);
                 }
                 break;
@@ -159,9 +162,10 @@ public class AutonBlueClose extends OpMode {
                     outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityShort*1.025);
                 } else if (pathTimer.getElapsedTime() < 2500+2000) {
                     intake.setIntakePower(0.8);
-                    outtake.setFeederPower(0.8);
+                    feeder.setFeederPower(0.8);
                 } else {
-                    outtake.stopMotors();
+                    outtake.stopOuttakeMotor();
+                    feeder.stopMotor();
                     setPathState(4);
                 }
                 break;
@@ -189,9 +193,10 @@ public class AutonBlueClose extends OpMode {
                     outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityShort*1.025);
                 } else if (pathTimer.getElapsedTime() < 2500+2500) {
                     intake.setIntakePower(0.8);
-                    outtake.setFeederPower(0.8);
+                    feeder.setFeederPower(0.8);
                 } else {
-                    outtake.stopMotors();
+                    outtake.stopOuttakeMotor();
+                    feeder.stopMotor();
                     setPathState(7);
                 }
                 break;
@@ -219,9 +224,10 @@ public class AutonBlueClose extends OpMode {
                     outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityShort*1.025);
                 } else if (pathTimer.getElapsedTime() < 3500+2000) {
                     intake.setIntakePower(0.8);
-                    outtake.setFeederPower(0.8);
+                    feeder.setFeederPower(0.8);
                 } else {
-                    outtake.stopMotors();
+                    outtake.stopOuttakeMotor();
+                    feeder.stopMotor();
                     follower.followPath(Path8);
                     setPathState(10);
                 }
@@ -275,21 +281,21 @@ public class AutonBlueClose extends OpMode {
         if (pathTimer.getElapsedTime() < startDelay) {
 
         } else if (pathTimer.getElapsedTime() < startDelay+shotOneTiming) {
-            outtake.setFeederPower(0.8);
+            feeder.setFeederPower(0.8);
         } else if (pathTimer.getElapsedTime() < startDelay+shotOneTiming+shotTwoDelay) {
-            outtake.stopFeederMotor();
+            feeder.stopMotor();
         } else if (pathTimer.getElapsedTime() < startDelay+shotOneTiming+shotTwoDelay+shotTwoTiming) {
-            outtake.setFeederPower(0.8);
+            feeder.setFeederPower(0.8);
             intake.setIntakePower(0.8);
         } else if (pathTimer.getElapsedTime() < startDelay+shotOneTiming+shotTwoDelay+shotTwoTiming+shotThreeDelay) {
             intake.stopMotor();
-            outtake.stopFeederMotor();
+            feeder.stopMotor();
         } else if (pathTimer.getElapsedTime() < startDelay+shotOneTiming+shotTwoDelay+shotTwoTiming+shotThreeDelay+shotThreeTiming) {
-            outtake.setFeederPower(0.8);
+            feeder.setFeederPower(0.8);
             intake.setIntakePower(0.8);
         } else {
             outtake.stopOuttakeMotor();
-            outtake.stopFeederMotor();
+            feeder.stopMotor();
             intake.stopMotor();
             setPathState(nextPathState);
         }
@@ -299,9 +305,9 @@ public class AutonBlueClose extends OpMode {
         if (pathTimer.getElapsedTime() < intakeTime) {
             intake.setIntakePower(1);
         } else if (pathTimer.getElapsedTime() < intakeTime+feederTime) {
-            outtake.setFeederVelocity(0.8);
+            feeder.setFeederVelocity(0.8);
         } else if (follower.getPathCompletion() < 1) {
-            outtake.stopFeederMotor();
+            feeder.stopMotor();
         } else {
         }
     }
@@ -348,6 +354,7 @@ public class AutonBlueClose extends OpMode {
 
         intake = robot.intake;
         outtake = robot.outtake;
+        feeder = robot.feeder;
 
         drawCurrent();
     }

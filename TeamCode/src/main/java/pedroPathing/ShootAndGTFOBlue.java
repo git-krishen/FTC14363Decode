@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import subsystems.Feeder;
 import subsystems.Intake;
 import subsystems.Outtake;
 import util.RobotConstants;
@@ -46,6 +47,7 @@ public class ShootAndGTFOBlue extends OpMode {
 
     private Intake intake;
     private Outtake outtake;
+    private Feeder feeder;
 
     public void buildPaths() {
         score = createLine(startPose, scorePose);
@@ -140,21 +142,21 @@ public class ShootAndGTFOBlue extends OpMode {
         if (pathTimer.getElapsedTime() < startDelay) {
 
         } else if (pathTimer.getElapsedTime() < startDelay+shotOneTiming) {
-            outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
+            feeder.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
         } else if (pathTimer.getElapsedTime() < startDelay+shotOneTiming+shotTwoDelay) {
-            outtake.stopFeederMotor();
+            feeder.stopMotor();
         } else if (pathTimer.getElapsedTime() < startDelay+shotOneTiming+shotTwoDelay+shotTwoTiming) {
-            outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
+            feeder.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
             intake.setIntakeMotorVelocity(RobotConstants.Intake.intakeVelocity);
         } else if (pathTimer.getElapsedTime() < startDelay+shotOneTiming+shotTwoDelay+shotTwoTiming+shotThreeDelay) {
             intake.stopMotor();
-            outtake.stopFeederMotor();
+            feeder.stopMotor();
         } else if (pathTimer.getElapsedTime() < startDelay+shotOneTiming+shotTwoDelay+shotTwoTiming+shotThreeDelay+shotThreeTiming) {
-            outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
+            feeder.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
             intake.setIntakeMotorVelocity(RobotConstants.Intake.intakeVelocity);
         } else {
             outtake.stopOuttakeMotor();
-            outtake.stopFeederMotor();
+            feeder.stopMotor();
             intake.stopMotor();
             setPathState(nextPathState);
         }
@@ -163,11 +165,11 @@ public class ShootAndGTFOBlue extends OpMode {
     private void handleIntake(int intakeTime, int reverseTime) {
         if (pathTimer.getElapsedTime() < intakeTime) {
             intake.setIntakePower(1);
-            outtake.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
+            feeder.setFeederVelocity(RobotConstants.Outtake.feederVelocity);
         } else if (pathTimer.getElapsedTime() < intakeTime+reverseTime) {
-            outtake.setFeederVelocity(-RobotConstants.Outtake.feederVelocity);
+            feeder.setFeederVelocity(-RobotConstants.Outtake.feederVelocity);
         } else if (follower.getPathCompletion() < 1) {
-            outtake.stopFeederMotor();
+            feeder.stopMotor();
         } else {
             intake.stopMotor();
         }
@@ -213,6 +215,7 @@ public class ShootAndGTFOBlue extends OpMode {
 
         intake = robot.intake;
         outtake = robot.outtake;
+        feeder = robot.feeder;
 
         drawCurrent();
     }

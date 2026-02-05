@@ -1,6 +1,5 @@
 package util;
 
-import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
@@ -8,12 +7,8 @@ import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -23,6 +18,7 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
 import pedroPathing.Constants;
+import subsystems.Feeder;
 import subsystems.Intake;
 import subsystems.Limelight;
 import subsystems.MecanumDrive;
@@ -70,6 +66,7 @@ public class RobotHardware {
     // Subsystems
     public Intake intake;
     public Outtake outtake;
+    public Feeder feeder;
     public MecanumDrive drivetrain;
     public Turret turret;
     public Limelight limelight;
@@ -169,18 +166,19 @@ public class RobotHardware {
         intake = new Intake();
         outtake = new Outtake();
         outtake.register();
-        turret = new Turret();
-//        turret.register();
-//        turret.forceResetTotalRotation();
-//        limelight = new Limelight();
-//        limelight.updateLimelightPose(
-//                RobotConstants.Limelight.axisForward-RobotConstants.Limelight.rotRadius,
-//                RobotConstants.Limelight.axisRight,
-//                RobotConstants.Limelight.axisUp,
-//                0,
-//                15,
-//                0
-//                );
+        feeder = new Feeder();
+        turret = new Turret(Turret.Direction.REVERSE);
+        turret.register();
+        limelight = new Limelight();
+        limelight.updateLimelightPose(
+                RobotConstants.Limelight.axisForward-RobotConstants.Limelight.rotRadius,
+                RobotConstants.Limelight.axisRight,
+                RobotConstants.Limelight.axisUp,
+                0,
+                15,
+                0
+                );
+        limelight.setLimelightYaw(0);
 
         // ******************* CAMERA ******************* //
 //        WebcamName webcam = hardwareMap.get(WebcamName.class, "webcam1");

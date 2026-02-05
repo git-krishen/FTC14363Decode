@@ -52,30 +52,8 @@ public class Outtake implements Subsystem {
         }
     }
 
-    public double getFeederVelocity() {
-        return robot.feederMotor.getVelocity(AngleUnit.RADIANS);
-    }
-
-    public void setFeederVelocity(double speed) {
-        if (!robot.outtakeMotor.isOverCurrent()) {
-            robot.feederMotor.setVelocity(speed, AngleUnit.RADIANS);
-        }
-    }
-
-    public double getFeederPower() {
-        return robot.feederMotor.getPower();
-    }
-
-    public void setFeederPower(double power) {
-        robot.feederMotor.setPower(power);
-    }
-
     public void stopOuttakeMotor() {
         targetVelocity = 0;
-    }
-
-    public void stopFeederMotor() {
-        robot.feederMotor.setVelocity(0);
     }
 
     public void stopMotors() {

@@ -2,6 +2,7 @@ package pedroPathing;
 
 import com.pedropathing.control.FilteredPIDFCoefficients;
 import com.pedropathing.control.PIDFCoefficients;
+import com.pedropathing.control.PredictiveBrakingCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
@@ -37,7 +38,13 @@ public class Constants {
             .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(1,0, 0, 0))
             .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.015,0.01, 0.001,0.6,0.01)) //0.015 0.01 0.0001 0.6 0.01
             .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.02,0.01, 0.00001,0.6,0.01)) //0.02, 0.01
-            .centripetalScaling(0.005);
+            .centripetalScaling(0.005)
+            .predictiveBrakingCoefficients(new PredictiveBrakingCoefficients(
+                    0.05,
+                    0.1,
+                    0.001
+            ))
+            .translationalIntegral(0);
 
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)
