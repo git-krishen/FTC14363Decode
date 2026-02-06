@@ -35,4 +35,8 @@ public class LEDIndicator {
     public void setColorRed() {
         setBrightness(0.700);
     }
+
+    public void setColorGreen() {
+        setBrightness(0.5);
+    }
 }

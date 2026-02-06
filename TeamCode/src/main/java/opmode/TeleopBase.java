@@ -34,6 +34,7 @@ public class TeleopBase extends CommandOpMode {
     private Intake intake;
     private Outtake outtake;
     private Turret turret;
+    private LEDIndicator led;
     // Maybe I need to set states here???
 
 
@@ -43,6 +44,7 @@ public class TeleopBase extends CommandOpMode {
         driver = new GamepadEx(gamepad1);
         driver2 = new GamepadEx(gamepad2);
         robot.init(hardwareMap, driver);
+        led = new LEDIndicator();
 
         this.drivetrain = robot.drivetrain;
         this.intake = robot.intake;
@@ -199,12 +201,19 @@ public class TeleopBase extends CommandOpMode {
                 new Command() {
                     @Override
                     public void execute() {
-                        LEDIndicator led = new LEDIndicator();
                         led.turnOn();
                         if (driver.getGamepadButton(GamepadKeys.Button.A).get()) {
                             outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityLong);
+                            while (outtake.getOuttakeVelocity() < RobotConstants.Outtake.outtakeVelocityLong) {
+                                led.setColorRed();
+                            }
+                            led.setColorGreen();
                         } else {
                             outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityShort);
+                            while (outtake.getOuttakeVelocity() < RobotConstants.Outtake.outtakeVelocityLong) {
+                                led.setColorRed();
+                            }
+                            led.setColorRed();
                         }
                     }
 
