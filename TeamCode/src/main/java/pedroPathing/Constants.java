@@ -36,8 +36,8 @@ public class Constants {
             .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.05,0, 0.01,0))
             .headingPIDFCoefficients(new PIDFCoefficients(0.7,0,0.01,0))
             .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(1,0, 0, 0))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.015,0.01, 0.001,0.6,0.01)) //0.015 0.01 0.0001 0.6 0.01
-            .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.02,0.01, 0.00001,0.6,0.01)) //0.02, 0.01
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.2,0.01, 0.001,0.6,0.01)) //0.015 0.01 0.0001 0.6 0.01
+            .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.07,0.01, 0.00001,0.6,0.01)) //0.02, 0.01
             .centripetalScaling(0.005)
             .predictiveBrakingCoefficients(new PredictiveBrakingCoefficients(
                     0.05,
@@ -59,8 +59,8 @@ public class Constants {
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             // TODO: Tune these (https://pedropathing.com/docs/pathing/tuning/automatic)
 //            // Max robot velocity in 48 inches (length can be changed in Forward/LateralVelocityTuner but larger numbers are better)
-            .xVelocity(60) // 81
-            .yVelocity(60)
+            .xVelocity(80) // 81
+            .yVelocity(70)
             .useBrakeModeInTeleOp(true); // 71
 
     public static PinpointConstants localizerConstants = new PinpointConstants()

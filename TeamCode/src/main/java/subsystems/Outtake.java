@@ -62,6 +62,14 @@ public class Outtake implements Subsystem {
         robot.feederMotor.setVelocity(0);
     }
 
+    public boolean atTargetSpeed() {
+        return atTargetSpeed(20);
+    }
+
+    public boolean atTargetSpeed(double tolerance) {
+        return Math.abs(targetVelocity-getOuttakeVelocity()) < tolerance;
+    }
+
     @Override
     public void periodic() {
         // Get loop time for derivative and integral calculations

@@ -8,11 +8,7 @@ import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
-import pedroPathing.Constants;
-import util.HeadingPID;
+import util.RobotConstants;
 import util.RobotHardware;
 
 public class MecanumDrive implements Subsystem {
@@ -21,12 +17,10 @@ public class MecanumDrive implements Subsystem {
     private boolean slowmode;
 
     private Pose pose;
-    private HeadingPID pid;
 
     public MecanumDrive() {
         this.robot = RobotHardware.getInstance();
         this.pose = new Pose();
-        pid = new HeadingPID(0.5,0,0.01,10,10);
     }
 
     public Pose getCurrentPose() {
@@ -95,5 +89,11 @@ public class MecanumDrive implements Subsystem {
         robot.leftRear.setPower(leftRearPower * mult);
         robot.rightFront.setPower(rightFrontPower * mult);
         robot.rightRear.setPower(rightRearPower * mult);
+    }
+
+    public double getDistanceToGoal() {
+        double y = robot.follower.getPose().getY();
+        double x = robot.follower.getPose().getX();
+        return Math.hypot(RobotConstants.Turret.scoreRedX-x, RobotConstants.Turret.scoreRedY-y);
     }
 }

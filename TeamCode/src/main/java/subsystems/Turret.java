@@ -221,10 +221,9 @@ public class Turret implements Subsystem {
     }
 
     public void setTargetRotationTurret(double target) {
-        if (target < RobotConstants.Turret.maxAngle && target > RobotConstants.Turret.minAngle) {
-            targetRotation = target/RobotConstants.Turret.gearRatio;
-            resetPID();
-        }
+        target = Math.clamp(target, RobotConstants.Turret.minAngle, RobotConstants.Turret.maxAngle);
+        targetRotation = target/RobotConstants.Turret.gearRatio;
+        resetPID();
     }
 
 
@@ -237,7 +236,7 @@ public class Turret implements Subsystem {
 
     // Check if servo is at target (default tolerance)
     public boolean isAtTarget() {
-        return isAtTarget(5);
+        return isAtTarget(5/RobotConstants.Turret.gearRatio);
     }
 
     // Check if servo is at target (custom tolerance)
@@ -354,9 +353,7 @@ public class Turret implements Subsystem {
     }
 
     public void lockToAprilTag() {
-        if (robot.limelight.hasTarget()) {
-            setTargetRotationTurret(getTotalRotationTurret()-(robot.limelight.getTargetX().orElse(0)));
-        }
+        setTargetRotationTurret(getTotalRotationTurret()-(robot.limelight.getTargetX().orElse(0)));
     }
 
 //

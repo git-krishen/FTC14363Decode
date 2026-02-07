@@ -1,6 +1,7 @@
 package util;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.pedropathing.geometry.Pose;
 
 public class RobotConstants {
     public static class Drivetrain {
@@ -8,6 +9,7 @@ public class RobotConstants {
         public static String leftRear = "backLeftMotor"; // 2
         public static String rightFront = "frontRightMotor"; // 0
         public static String rightRear = "backRightMotor"; // 3
+        public static Pose autonEndPose = new Pose(124,48,Math.toRadians(0));
     }
 
     public static class Intake {
@@ -30,6 +32,10 @@ public class RobotConstants {
 //        public static double outtakeVelocityShort = Math.PI*0.85;;
         public static double outtakeVelocityLong = 1400; // 2600;// Math.PI*1.18; // 0.0435
 //        public static double outtakeVelocityLong = Math.PI*1.18;;
+        public static double shotSpeedSlope = 5.40541;
+        public static double shotSpeedIntercept = 675.67568;
+        public static double shotSpeedMin = 0;
+        public static double shotSpeedMax = 1500;
         public static double kP = 0.003; // 0.007;
         public static double kI = 0.01; // 0.000001;
         public static double kD = 0.00005; // 0
@@ -57,7 +63,7 @@ public class RobotConstants {
         public static double minAngle = -150;
         public static double turretSpeed = 15;
         public static double maxPower = 0.5;
-        public static double kP = 0.006; // 0.002; // 0.006 // 0.015;
+        public static double kP = 0.003; // 0.002; // 0.006 // 0.015;
         public static double kI = 0; // 0.01967213;
         public static double kD = 0; // 0.0004575;
         public static double kS = 0.02;

@@ -32,6 +32,7 @@ public class TeleopBase extends CommandOpMode {
     private Outtake outtake;
     private Feeder feeder;
     private Turret turret;
+    private Pose scorePose;
     // Maybe I need to set states here???
 
 
@@ -48,11 +49,20 @@ public class TeleopBase extends CommandOpMode {
         this.feeder = robot.feeder;
         this.turret = robot.turret;
 
+        scorePose = new Pose(RobotConstants.Turret.scoreRedX, RobotConstants.Turret.scoreRedY);
+
+        CommandScheduler.getInstance().registerSubsystem(outtake, turret);
+
+        robot.follower.setPose(RobotConstants.Drivetrain.autonEndPose);
+
         configureBindings();
     }
 
     @Override
     public void run() {
+        CommandScheduler.getInstance().run();
+        robot.follower.update();
+
         Pose llPoseEstimate = robot.limelight.getRobotPose().orElse(new Pose(-67,-67,0));
         robot.telemetryManager.addData("x", robot.follower.getPose().getX() + " | " + llPoseEstimate.getX());
         robot.telemetryManager.addData("y", robot.follower.getPose().getY() + " | " + llPoseEstimate.getY());
@@ -63,9 +73,9 @@ public class TeleopBase extends CommandOpMode {
         robot.telemetryManager.addData("limelight", robot.limelight.getOrientationArrayString());
         robot.telemetryManager.addData("distance (intake|outtake)", robot.intakeDistanceSensor.getDistance(DistanceUnit.MM) + " | " + robot.outtakeDistanceSensor.getDistance(DistanceUnit.MM));
         robot.telemetryManager.update();
-        CommandScheduler.getInstance().run();
-        robot.follower.update();
     }
+
+
 
     private void configureBindings() {
         drivetrain.setDefaultCommand(new RunCommand(() -> {
@@ -86,7 +96,22 @@ public class TeleopBase extends CommandOpMode {
             double up = RobotConstants.Limelight.axisUp;
             robot.limelight.updateLimelightPose(forward, right, up, angle, 15.0, 0.0);
             if (robot.limelight.hasTarget()) {
-                turret.setTargetRotationTurret(turret.getTotalRotationTurret()-(robot.limelight.getTargetX().orElse(0)));
+                turret.lockToAprilTag();
+            } else {
+//                turret.setTargetRotationTurret(0);
+
+                double x = robot.follower.getPose().getX();
+                double y = robot.follower.getPose().getY();
+                double botHeading = robot.follower.getPose().getHeading();
+                x += RobotConstants.Turret.turretOffsetX*Math.cos(botHeading) - RobotConstants.Turret.turretOffsetY*Math.sin(botHeading);
+                y += RobotConstants.Turret.turretOffsetX*Math.sin(botHeading) + RobotConstants.Turret.turretOffsetY*Math.cos(botHeading);
+                double reqAngle = Math.atan2(RobotConstants.Turret.scoreRedY-y,RobotConstants.Turret.scoreRedY-x);
+                double delta = reqAngle - botHeading;
+                delta -= Math.PI/2;
+                double finalAngle = Math.toDegrees(Math.atan2(Math.sin(delta),Math.cos(delta)));
+                finalAngle += Math.PI/2;
+                robot.telemetryManager.debug("odoShoot", finalAngle);
+//                turret.setTargetRotationTurret(Math.toDegrees(Math.atan2(Math.sin(delta),Math.cos(delta))));
             }
             }, turret));
 
@@ -148,7 +173,7 @@ public class TeleopBase extends CommandOpMode {
                 new InstantCommand(
                         () -> {
                             feeder.setFeederPower(-1);
-                            intake.setIntakePower(-0.5);
+                            intake.setIntakePower(-1);
                         },
                         feeder, intake
                 )
@@ -252,6 +277,8 @@ public class TeleopBase extends CommandOpMode {
                 new Command() {
                     @Override
                     public void execute() {
+//                        double lerp = RobotConstants.Outtake.shotSpeedSlope*drivetrain.getDistanceToGoal() + RobotConstants.Outtake.shotSpeedIntercept;
+//                        outtake.setOuttakeVelocity(Math.clamp(lerp, RobotConstants.Outtake.shotSpeedMin, RobotConstants.Outtake.shotSpeedMax));
                         if (driver.getGamepadButton(GamepadKeys.Button.A).get()) {
                             outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityLong);
                         } else {
@@ -305,5 +332,9 @@ public class TeleopBase extends CommandOpMode {
 //                    }
 //                }, false
 //        );
+    }
+
+    public void setScorePose(Pose p) {
+        this.scorePose = p;
     }
 }

@@ -28,6 +28,9 @@ public class Intake implements Subsystem {
     public void setIntakePower(double power) {
         robot.intakeMotor.setPower(power);
     }
+    public void runIntake() {
+        setIntakePower(1);
+    }
 
     public void stopMotor() {
         robot.intakeMotor.setPower(0);

@@ -3,6 +3,7 @@ package util;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -165,10 +166,8 @@ public class RobotHardware {
         drivetrain = new MecanumDrive();
         intake = new Intake();
         outtake = new Outtake();
-        outtake.register();
         feeder = new Feeder();
         turret = new Turret(Turret.Direction.REVERSE);
-        turret.register();
         limelight = new Limelight();
         limelight.updateLimelightPose(
                 RobotConstants.Limelight.axisForward-RobotConstants.Limelight.rotRadius,

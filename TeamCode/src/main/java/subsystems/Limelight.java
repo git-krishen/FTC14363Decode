@@ -52,7 +52,7 @@ public class Limelight implements Subsystem {
 
                 latestOrientation.set(getOrientationArrayStringInternal());
 
-                Thread.sleep(50);
+                Thread.sleep(20);
             } catch (InterruptedException e) {
                 break;
             }
