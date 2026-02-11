@@ -71,6 +71,7 @@ public class RobotHardware {
     public MecanumDrive drivetrain;
     public Turret turret;
     public Limelight limelight;
+    public Servo led;
 
     public TelemetryManager telemetryManager;
 
@@ -151,6 +152,9 @@ public class RobotHardware {
 
         intakeDistanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, RobotConstants.Outtake.distanceSensorFeed);
         outtakeDistanceSensor = hardwareMap.get(Rev2mDistanceSensor.class, RobotConstants.Outtake.distanceSensorOut);
+
+        // ****************** LED ************************//
+        led = hardwareMap.get(Servo.class, "robot_led");
 
         // ******************* TURRET ******************* //
         turretServo = hardwareMap.get(CRServo.class, "turretServo");
