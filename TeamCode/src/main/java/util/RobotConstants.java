@@ -36,7 +36,7 @@ public class RobotConstants {
         public static double shotSpeedIntercept = 675.67568;
         public static double shotSpeedMin = 0;
         public static double shotSpeedMax = 1500;
-        public static double kP = 0.003; // 0.007;
+        public static double kP = 0.005; // 0.007;
         public static double kI = 0.01; // 0.000001;
         public static double kD = 0.00005; // 0
         public static double kS = 0.07; // 0.07;

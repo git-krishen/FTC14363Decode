@@ -26,12 +26,13 @@ public class AutonRedFar extends AutonTemplate {
                         new BezierLine(
                                 new Pose(87.000, 9.000),
 
-                                new Pose(132.000, 9.000)
+                                new Pose(124.000, 9.000) //134
                         )
                 ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                .setVelocityConstraint(10)
                 .addPath(
                         new BezierLine(
-                                new Pose(132.000, 9.000),
+                                new Pose(124.000, 9.000),
 
                                 new Pose(87.000, 9.000)
                         )
@@ -51,12 +52,12 @@ public class AutonRedFar extends AutonTemplate {
                         new BezierLine(
                                 new Pose(100.000, 36.000),
 
-                                new Pose(120.000, 36.000)
+                                new Pose(124.000, 36.000)
                         )
                 ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                 .addPath(
                         new BezierLine(
-                                new Pose(120.000, 36.000),
+                                new Pose(124.000, 36.000),
 
                                 new Pose(87.000, 9.000)
                         )
@@ -127,14 +128,16 @@ public class AutonRedFar extends AutonTemplate {
     public void init() {
         super.init();
         autonomousCommand = new CommandSequenceBuilder()
-                .setTurretAngle(62.5)
+                .setTurretAngle(68)
                 .outtakeStart(RobotConstants.Outtake.outtakeVelocityLong)
+                .delay(2)
                 .shoot(RobotConstants.Outtake.outtakeVelocityLong, 2)
                 .parallel((p) -> p.runFeeder().moveTo(Path1))
                 .shoot(RobotConstants.Outtake.outtakeVelocityLong, 2)
                 .parallel((p) -> p.runFeeder().moveTo(Path2))
                 .shoot(RobotConstants.Outtake.outtakeVelocityLong, 2)
                 .parallel((p) -> p.runFeeder().moveTo(Path3))
+                .setTurretAngle(45)
                 .shoot(RobotConstants.Outtake.outtakeVelocityShort, 2)
                 .parallel((p) -> p.runFeeder().moveTo(Path4))
                 .shoot(RobotConstants.Outtake.outtakeVelocityShort, 2)
