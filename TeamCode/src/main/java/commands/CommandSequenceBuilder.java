@@ -264,6 +264,26 @@ public class CommandSequenceBuilder {
     }
 
     /**
+     * Adds an outtake start command.
+     *
+     * @return this builder for chaining
+     */
+    public CommandSequenceBuilder outtakeStart(double vel) {
+        commands.add(new OuttakeStartCommand(outtake, vel));
+        return this;
+    }
+
+    /**
+     * Adds an outtake stop command.
+     *
+     * @return this builder for chaining
+     */
+    public CommandSequenceBuilder outtakeStop() {
+        commands.add(new OuttakeStopCommand(outtake));
+        return this;
+    }
+
+    /**
      * Adds an intake start command.
      *
      * @return this builder for chaining
@@ -502,6 +522,16 @@ public class CommandSequenceBuilder {
         // Action methods
         public ParallelBuilder shoot(double vel, double timeOutSeconds) {
             parallelCommands.add(new ShootCommand(outtake, feeder, intake, vel, timeOutSeconds));
+            return this;
+        }
+
+        public ParallelBuilder outtakeStart(double vel) {
+            parallelCommands.add(new OuttakeStartCommand(outtake, vel));
+            return this;
+        }
+
+        public ParallelBuilder outtakeStop() {
+            parallelCommands.add(new OuttakeStopCommand(outtake));
             return this;
         }
 

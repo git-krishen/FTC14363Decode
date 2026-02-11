@@ -91,9 +91,9 @@ public class MecanumDrive implements Subsystem {
         robot.rightRear.setPower(rightRearPower * mult);
     }
 
-    public double getDistanceToGoal() {
+    public double getDistanceToGoal(Pose goal) {
         double y = robot.follower.getPose().getY();
         double x = robot.follower.getPose().getX();
-        return Math.hypot(RobotConstants.Turret.scoreRedX-x, RobotConstants.Turret.scoreRedY-y);
+        return Math.hypot(goal.getX()-x, goal.getY()-y);
     }
 }

@@ -33,16 +33,16 @@ public class Constants {
             .useSecondaryDrivePIDF(true)
             // TODO: Tune these (https://pedropathing.com/docs/pathing/tuning/pids/translational and heading and drive)
             .translationalPIDFCoefficients(new PIDFCoefficients(0.3,0,0.05,0))
-            .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.05,0, 0.01,0))
+            .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.15,0, 0.01,0))
             .headingPIDFCoefficients(new PIDFCoefficients(0.7,0,0.01,0))
-            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(1,0, 0, 0))
+            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(0.75,0, 0, 0))
             .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.2,0.01, 0.001,0.6,0.01)) //0.015 0.01 0.0001 0.6 0.01
-            .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.07,0.01, 0.00001,0.6,0.01)) //0.02, 0.01
-            .centripetalScaling(0.005)
+            .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.05,0.01, 0.00001,0.6,0.01)) //0.02, 0.01
+            .centripetalScaling(0.0006)
             .predictiveBrakingCoefficients(new PredictiveBrakingCoefficients(
-                    0.05,
                     0.1,
-                    0.001
+                    0.0228337,
+                    0.00303679
             ))
             .translationalIntegral(0);
 

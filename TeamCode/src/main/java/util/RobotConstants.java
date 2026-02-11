@@ -28,9 +28,9 @@ public class RobotConstants {
         public static double outtakeSensorThreshold = 100;
         public static double feederVelocity = Math.PI*2;
         //The only one that actually does anything (degree ticks per second)
-        public static double outtakeVelocityShort = 1200; // 2325; // Math.PI*0.85; // 0.0375 // (500/60.0)*28;
+        public static double outtakeVelocityShort = 925; // 2325; // Math.PI*0.85; // 0.0375 // (500/60.0)*28;
 //        public static double outtakeVelocityShort = Math.PI*0.85;;
-        public static double outtakeVelocityLong = 1400; // 2600;// Math.PI*1.18; // 0.0435
+        public static double outtakeVelocityLong = 1075; // 2600;// Math.PI*1.18; // 0.0435
 //        public static double outtakeVelocityLong = Math.PI*1.18;;
         public static double shotSpeedSlope = 5.40541;
         public static double shotSpeedIntercept = 675.67568;
@@ -59,8 +59,8 @@ public class RobotConstants {
         public static double scoreBlueX = 0;
         public static double scoreBlueY = 141.0;
         public static double gearRatio = 29.0/120.0;
-        public static double maxAngle = 30;
-        public static double minAngle = -150;
+        public static double maxAngle = 90;
+        public static double minAngle = -225;
         public static double turretSpeed = 15;
         public static double maxPower = 0.5;
         public static double kP = 0.003; // 0.002; // 0.006 // 0.015;

@@ -161,7 +161,7 @@ public class RobotHardware {
         ll.setPollRateHz(100);
         ll.pipelineSwitch(9);
         ll.updateRobotOrientation(0);
-        ll.start();
+        ll.pause();
 
         drivetrain = new MecanumDrive();
         intake = new Intake();

@@ -2,13 +2,19 @@ package pedroPathing;
 
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.RunCommand;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.Path;
+import com.pedropathing.paths.PathBuilder;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import subsystems.Feeder;
 import subsystems.Intake;
@@ -60,6 +66,7 @@ public abstract class AutonTemplate extends OpMode {
         follower = robot.follower;
         buildPaths();
 
+        robot.ll.start();
         intake = robot.intake;
         outtake = robot.outtake;
         feeder = robot.feeder;
@@ -99,7 +106,10 @@ public abstract class AutonTemplate extends OpMode {
         follower.activateAllPIDFs();
 
         if (autonomousCommand != null) {
-            CommandScheduler.getInstance().schedule(autonomousCommand);
+            CommandScheduler.getInstance().schedule(
+                    autonomousCommand
+                    .alongWith(new RunCommand(() -> intake.setIntakePower(1)))
+            );
         }
     }
 
@@ -107,5 +117,8 @@ public abstract class AutonTemplate extends OpMode {
     public void stop() {
         RobotConstants.Drivetrain.autonEndPose = follower.getPose();
         CommandScheduler.getInstance().reset();
+        outtake.stopOuttakeMotor();
+        intake.stopMotor();
+        feeder.stopMotor();
     }
 }

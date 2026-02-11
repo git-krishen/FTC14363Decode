@@ -35,7 +35,7 @@ public class ShootCommand extends CommandBase {
         outtake.setOuttakeVelocity(targetVel);
         if (outtake.atTargetSpeed() || timer.seconds() >= timeout-500) {
             feeder.setFeederPower(1);
-            intake.setIntakePower(1);
+//            intake.setIntakePower(1);
         }
     }
 
@@ -46,7 +46,7 @@ public class ShootCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        outtake.setOuttakeVelocity(0);
-        intake.stopMotor();
+//        outtake.setOuttakeVelocity(0);
+//        intake.stopMotor();
     }
 }

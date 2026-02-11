@@ -48,6 +48,7 @@ public class TeleopBase extends CommandOpMode {
         this.outtake = robot.outtake;
         this.feeder = robot.feeder;
         this.turret = robot.turret;
+        robot.ll.start();
 
         scorePose = new Pose(RobotConstants.Turret.scoreRedX, RobotConstants.Turret.scoreRedY);
 
@@ -89,31 +90,43 @@ public class TeleopBase extends CommandOpMode {
             );
             }, drivetrain));
 
-        turret.setDefaultCommand(new RunCommand(() -> {
-            double angle = turret.getTotalRotationTurret();
-            double forward = RobotConstants.Limelight.axisForward + Math.cos(Math.toRadians(angle))*RobotConstants.Limelight.rotRadius;
-            double right = RobotConstants.Limelight.axisRight + Math.sin(Math.toRadians(angle))*RobotConstants.Limelight.rotRadius;
-            double up = RobotConstants.Limelight.axisUp;
-            robot.limelight.updateLimelightPose(forward, right, up, angle, 15.0, 0.0);
-            if (robot.limelight.hasTarget()) {
-                turret.lockToAprilTag();
-            } else {
-//                turret.setTargetRotationTurret(0);
-
-                double x = robot.follower.getPose().getX();
-                double y = robot.follower.getPose().getY();
-                double botHeading = robot.follower.getPose().getHeading();
-                x += RobotConstants.Turret.turretOffsetX*Math.cos(botHeading) - RobotConstants.Turret.turretOffsetY*Math.sin(botHeading);
-                y += RobotConstants.Turret.turretOffsetX*Math.sin(botHeading) + RobotConstants.Turret.turretOffsetY*Math.cos(botHeading);
-                double reqAngle = Math.atan2(RobotConstants.Turret.scoreRedY-y,RobotConstants.Turret.scoreRedY-x);
-                double delta = reqAngle - botHeading;
-                delta -= Math.PI/2;
-                double finalAngle = Math.toDegrees(Math.atan2(Math.sin(delta),Math.cos(delta)));
-                finalAngle += Math.PI/2;
-                robot.telemetryManager.debug("odoShoot", finalAngle);
-//                turret.setTargetRotationTurret(Math.toDegrees(Math.atan2(Math.sin(delta),Math.cos(delta))));
-            }
-            }, turret));
+//        turret.setDefaultCommand(new RunCommand(() -> {
+//            double angle = turret.getTotalRotationTurret();
+//            double forward = RobotConstants.Limelight.axisForward + Math.cos(Math.toRadians(angle))*RobotConstants.Limelight.rotRadius;
+//            double right = RobotConstants.Limelight.axisRight + Math.sin(Math.toRadians(angle))*RobotConstants.Limelight.rotRadius;
+//            double up = RobotConstants.Limelight.axisUp;
+//            robot.limelight.updateLimelightPose(forward, right, up, angle, 15.0, 0.0);
+//            if (robot.limelight.hasTarget()) {
+//                turret.lockToAprilTag();
+//            } else {
+////                turret.setTargetRotationTurret(0);
+//
+//                double x = robot.follower.getPose().getX();
+//                double y = robot.follower.getPose().getY();
+//                double botHeading = robot.follower.getPose().getHeading();
+//                x += RobotConstants.Turret.turretOffsetX*Math.cos(botHeading) - RobotConstants.Turret.turretOffsetY*Math.sin(botHeading);
+//                y += RobotConstants.Turret.turretOffsetX*Math.sin(botHeading) + RobotConstants.Turret.turretOffsetY*Math.cos(botHeading);
+//                double reqAngle = Math.atan2(RobotConstants.Turret.scoreRedY-y,RobotConstants.Turret.scoreRedY-x);
+//                double delta = reqAngle - botHeading;
+//                delta -= Math.PI/2;
+//                double finalAngle = Math.toDegrees(Math.atan2(Math.sin(delta),Math.cos(delta)));
+//                finalAngle += Math.PI/2;
+//                robot.telemetryManager.debug("odoShoot", finalAngle);
+////                turret.setTargetRotationTurret(Math.toDegrees(Math.atan2(Math.sin(delta),Math.cos(delta))));
+//            }
+//            }, turret));
+        driver2.getGamepadButton(GamepadKeys.Button.A).whileHeld(
+                new InstantCommand(() -> {
+                    double angle = turret.getTotalRotationTurret();
+                    double forward = RobotConstants.Limelight.axisForward + Math.cos(Math.toRadians(angle))*RobotConstants.Limelight.rotRadius;
+                    double right = RobotConstants.Limelight.axisRight + Math.sin(Math.toRadians(angle))*RobotConstants.Limelight.rotRadius;
+                    double up = RobotConstants.Limelight.axisUp;
+                    robot.limelight.updateLimelightPose(forward, right, up, angle, 15.0, 0.0);
+                    if (robot.limelight.hasTarget()) {
+                        turret.lockToAprilTag();
+                    }
+                }, turret)
+        );
 
         driver.getGamepadButton(GamepadKeys.Button.START).whenPressed(
                 new InstantCommand(() -> {
@@ -152,22 +165,22 @@ public class TeleopBase extends CommandOpMode {
 //        );
 
 
-        driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(
-                new InstantCommand(
-                        () -> {
-                            outtake.setOuttakePower(-1);
-                        },
-                        outtake
-                )
-        );
-        driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenReleased(
-                new InstantCommand(
-                        () -> {
-                            outtake.stopOuttakeMotor();
-                        },
-                        outtake
-                )
-        );
+//        driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenPressed(
+//                new InstantCommand(
+//                        () -> {
+//                            outtake.setOuttakePower(-1);
+//                        },
+//                        outtake
+//                )
+//        );
+//        driver.getGamepadButton(GamepadKeys.Button.DPAD_UP).whenReleased(
+//                new InstantCommand(
+//                        () -> {
+//                            outtake.stopOuttakeMotor();
+//                        },
+//                        outtake
+//                )
+//        );
 
         driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(
                 new InstantCommand(
@@ -254,11 +267,7 @@ public class TeleopBase extends CommandOpMode {
                 new Command() {
                     @Override
                     public void execute() {
-                        if (driver.getGamepadButton(GamepadKeys.Button.A).get()) {
-                            feeder.setFeederPower(0.8);
-                        } else {
-                            feeder.setFeederPower(1);
-                        }
+                        feeder.setFeederPower(1);
                     }
 
                     @Override
@@ -273,30 +282,39 @@ public class TeleopBase extends CommandOpMode {
                 }
         );
 
-        driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenHeld(
-                new Command() {
-                    @Override
-                    public void execute() {
-//                        double lerp = RobotConstants.Outtake.shotSpeedSlope*drivetrain.getDistanceToGoal() + RobotConstants.Outtake.shotSpeedIntercept;
-//                        outtake.setOuttakeVelocity(Math.clamp(lerp, RobotConstants.Outtake.shotSpeedMin, RobotConstants.Outtake.shotSpeedMax));
-                        if (driver.getGamepadButton(GamepadKeys.Button.A).get()) {
-                            outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityLong);
-                        } else {
-                            outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityShort);
-                        }
-                    }
-
-                    @Override
-                    public void end(boolean interrupted) {
-                        outtake.stopOuttakeMotor();
-                    }
-
-                    @Override
-                    public Set<Subsystem> getRequirements() {
-                        return Set.of(outtake);
-                    }
-                }
-        );
+//        driver.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenHeld(
+//                new Command() {
+//                    @Override
+//                    public void execute() {
+////                        double lerp = RobotConstants.Outtake.shotSpeedSlope*drivetrain.getDistanceToGoal() + RobotConstants.Outtake.shotSpeedIntercept;
+////                        outtake.setOuttakeVelocity(Math.clamp(lerp, RobotConstants.Outtake.shotSpeedMin, RobotConstants.Outtake.shotSpeedMax));
+//                        if (driver.getGamepadButton(GamepadKeys.Button.A).get()) {
+//                            outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityLong);
+//                        } else {
+//                            outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityShort);
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void end(boolean interrupted) {
+//                        outtake.stopOuttakeMotor();
+//                    }
+//
+//                    @Override
+//                    public Set<Subsystem> getRequirements() {
+//                        return Set.of(outtake);
+//                    }
+//                }
+//        );
+        outtake.setDefaultCommand(new RunCommand(() -> {
+//            double lerp = RobotConstants.Outtake.shotSpeedSlope*drivetrain.getDistanceToGoal(scorePose) + RobotConstants.Outtake.shotSpeedIntercept;
+//            outtake.setOuttakeVelocity(Math.clamp(lerp, RobotConstants.Outtake.shotSpeedMin, RobotConstants.Outtake.shotSpeedMax));
+            if (driver2.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.3) {
+                outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityLong);
+            } else {
+                outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityShort);
+            }
+        }, outtake));
 
 //        driver.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whenPressed(
 //                new Command() {

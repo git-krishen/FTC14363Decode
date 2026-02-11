@@ -1,30 +1,16 @@
 package pedroPathing;
 
-import com.arcrobotics.ftclib.command.RunCommand;
-import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
-import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import commands.CommandSequenceBuilder;
-import commands.RunFeederCommand;
-import subsystems.Feeder;
-import subsystems.Intake;
-import subsystems.Outtake;
 import util.RobotConstants;
-import util.RobotHardware;
 
-@Autonomous(name = "AutonRedCloseGate", group = "Test")
-public class AutonRedCloseGate extends AutonTemplate {
+@Autonomous(name = "AutonRedCloseGateAlt", group = "Test")
+public class AutonRedCloseGateAlt extends AutonTemplate {
     private final Pose startPose = new Pose(122,122,Math.toRadians(0));
 
     // Paths
@@ -40,7 +26,7 @@ public class AutonRedCloseGate extends AutonTemplate {
                         new BezierLine(
                                 new Pose(122.000, 122.000),
 
-                                new Pose(95.000, 95.000)
+                                new Pose(85.000, 85.000)
                         )
                 ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
 
@@ -48,8 +34,8 @@ public class AutonRedCloseGate extends AutonTemplate {
 
         Path2 = follower.pathBuilder().addPath(
                         new BezierCurve(
-                                new Pose(95.000, 95.000),
-                                new Pose(84.115, 56.665),
+                                new Pose(85.000, 85.000),
+                                new Pose(82.573, 58.206),
                                 new Pose(100.000, 60.000)
                         )
                 ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
@@ -57,14 +43,14 @@ public class AutonRedCloseGate extends AutonTemplate {
                         new BezierLine(
                                 new Pose(100.000, 60.000),
 
-                                new Pose(118.000, 60.000)
+                                new Pose(124.000, 60.000)
                         )
                 ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                 .addPath(
-                        new BezierCurve(
-                                new Pose(118.000, 58.000),
-                                new Pose(89.904, 59.867),
-                                new Pose(95.000, 95.000)
+                        new BezierLine(
+                                new Pose(124.000, 60.000),
+
+                                new Pose(85.000, 85.000)
                         )
                 ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
 
@@ -72,34 +58,27 @@ public class AutonRedCloseGate extends AutonTemplate {
 
         Path3 = follower.pathBuilder().addPath(
                         new BezierCurve(
-                                new Pose(95.000, 95.000),
+                                new Pose(85.000, 85.000),
                                 new Pose(85.005, 47.890),
-                                new Pose(134.000, 56.000)
+                                new Pose(122.000, 56.000)
                         )
-                ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(35))
+                ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(25))
 
                 .build();
 
         Path4 = follower.pathBuilder().addPath(
                         new BezierCurve(
-                                new Pose(134.000, 56.000),
+                                new Pose(122.000, 56.000),
                                 new Pose(96.000, 60.000),
-                                new Pose(95.000, 95.000)
+                                new Pose(85.000, 85.000)
                         )
                 ).setLinearHeadingInterpolation(Math.toRadians(35), Math.toRadians(0))
 
                 .build();
 
         Path5 = follower.pathBuilder().addPath(
-                        new BezierCurve(
-                                new Pose(95.000, 95.000),
-                                new Pose(94.367, 84.381),
-                                new Pose(102.000, 85.000)
-                        )
-                ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
-                .addPath(
                         new BezierLine(
-                                new Pose(102.000, 85.000),
+                                new Pose(85.000, 85.000),
 
                                 new Pose(116.000, 85.000)
                         )
@@ -108,7 +87,7 @@ public class AutonRedCloseGate extends AutonTemplate {
                         new BezierLine(
                                 new Pose(116.000, 85.000),
 
-                                new Pose(95.000, 95.000)
+                                new Pose(85.000, 85.000)
                         )
                 ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
 
@@ -116,7 +95,7 @@ public class AutonRedCloseGate extends AutonTemplate {
 
         Path6 = follower.pathBuilder().addPath(
                         new BezierLine(
-                                new Pose(95.000, 95.000),
+                                new Pose(85.000, 85.000),
 
                                 new Pose(90.000, 60.000)
                         )
