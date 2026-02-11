@@ -10,6 +10,7 @@ import com.arcrobotics.ftclib.command.Subsystem;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.pedropathing.geometry.Pose;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
@@ -19,7 +20,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import subsystems.Intake;
-import subsystems.LEDIndicator;
 import subsystems.MecanumDrive;
 import subsystems.Outtake;
 import subsystems.Turret;
@@ -34,7 +34,7 @@ public class TeleopBase extends CommandOpMode {
     private Intake intake;
     private Outtake outtake;
     private Turret turret;
-    private LEDIndicator led;
+    private Servo led;
     // Maybe I need to set states here???
 
 
@@ -44,8 +44,8 @@ public class TeleopBase extends CommandOpMode {
         driver = new GamepadEx(gamepad1);
         driver2 = new GamepadEx(gamepad2);
         robot.init(hardwareMap, driver);
-        led = new LEDIndicator();
 
+        this.led = robot.led;
         this.drivetrain = robot.drivetrain;
         this.intake = robot.intake;
         this.outtake = robot.outtake;
@@ -201,19 +201,19 @@ public class TeleopBase extends CommandOpMode {
                 new Command() {
                     @Override
                     public void execute() {
-                        led.turnOn();
+                        led.setPosition(1.0);
                         if (driver.getGamepadButton(GamepadKeys.Button.A).get()) {
                             outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityLong);
-                            while (outtake.getOuttakeVelocity() < RobotConstants.Outtake.outtakeVelocityLong) {
-                                led.setColorRed();
-                            }
-                            led.setColorGreen();
+                            //if (outtake.getOuttakeVelocity() < RobotConstants.Outtake.outtakeVelocityLong) {
+                            //    led.setPosition(0.7);
+                            //}
+                            led.setPosition(0.5);
                         } else {
                             outtake.setOuttakeVelocity(RobotConstants.Outtake.outtakeVelocityShort);
-                            while (outtake.getOuttakeVelocity() < RobotConstants.Outtake.outtakeVelocityLong) {
-                                led.setColorRed();
-                            }
-                            led.setColorRed();
+                            //if (outtake.getOuttakeVelocity() < RobotConstants.Outtake.outtakeVelocityLong) {
+                             //   led.setPosition(0.7);
+                            //}
+                            led.setPosition(1);
                         }
                     }
 
