@@ -66,7 +66,7 @@ public abstract class AutonTemplate extends OpMode {
         follower = robot.follower;
         buildPaths();
 
-        robot.ll.start();
+        robot.ll.pipelineSwitch(9);
         intake = robot.intake;
         outtake = robot.outtake;
         feeder = robot.feeder;
@@ -109,6 +109,7 @@ public abstract class AutonTemplate extends OpMode {
             CommandScheduler.getInstance().schedule(
                     autonomousCommand
                     .alongWith(new RunCommand(() -> intake.setIntakePower(1)))
+                    .alongWith(new RunCommand(() -> turret.lockToAprilTag()))
             );
         }
     }

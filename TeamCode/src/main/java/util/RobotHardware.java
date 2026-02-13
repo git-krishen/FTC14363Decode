@@ -158,10 +158,10 @@ public class RobotHardware {
 
         // ******************* LIMELIGHT ******************* //
         ll = hardwareMap.get(Limelight3A.class, "limelight");
-        ll.setPollRateHz(100);
-        ll.pipelineSwitch(9);
+        ll.setPollRateHz(50);
+        ll.pipelineSwitch(0);
         ll.updateRobotOrientation(0);
-        ll.pause();
+        ll.start();
 
         drivetrain = new MecanumDrive();
         intake = new Intake();

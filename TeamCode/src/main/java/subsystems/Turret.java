@@ -353,7 +353,9 @@ public class Turret implements Subsystem {
     }
 
     public void lockToAprilTag() {
-        setTargetRotationTurret(getTotalRotationTurret()-(robot.limelight.getTargetX().orElse(0)));
+        if (robot.limelight.hasTarget()) {
+            setTargetRotationTurret(getTotalRotationTurret() - (robot.limelight.getTargetX().orElse(0)));
+        }
     }
 
 //

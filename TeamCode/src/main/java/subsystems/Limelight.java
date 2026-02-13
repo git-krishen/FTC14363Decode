@@ -27,7 +27,6 @@ import java.util.OptionalInt;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import util.RobotConstants;
 import util.RobotHardware;
 
 public class Limelight implements Subsystem {
@@ -52,7 +51,7 @@ public class Limelight implements Subsystem {
 
                 latestOrientation.set(getOrientationArrayStringInternal());
 
-                Thread.sleep(20);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 break;
             }
@@ -110,9 +109,16 @@ public class Limelight implements Subsystem {
         return tags;
     }
 
-    public Optional<Pose> getRobotPose() {
+    public Optional<Pose> getBotPoseMT2() {
         LLResult result = robot.ll.getLatestResult();
         Pose3D rawPose = result.getBotpose_MT2();
+        Pose pose = new Pose(DistanceUnit.INCH.fromMeters(rawPose.getPosition().x), DistanceUnit.INCH.fromMeters(rawPose.getPosition().y), rawPose.getOrientation().getYaw(AngleUnit.DEGREES));
+        return Optional.of(pose);
+    }
+
+    public Optional<Pose> getBotPoseMT1() {
+        LLResult result = robot.ll.getLatestResult();
+        Pose3D rawPose = result.getBotpose();
         Pose pose = new Pose(DistanceUnit.INCH.fromMeters(rawPose.getPosition().x), DistanceUnit.INCH.fromMeters(rawPose.getPosition().y), rawPose.getOrientation().getYaw(AngleUnit.DEGREES));
         return Optional.of(pose);
     }

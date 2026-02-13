@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import commands.CommandSequenceBuilder;
 import util.RobotConstants;
 
-@Autonomous(name = "AutonRedFar", group = "Test")
+@Autonomous(name = "AutonRedFar", group = "Red")
 public class AutonRedFar extends AutonTemplate {
     private final Pose startPose = new Pose(87,9,Math.toRadians(0));
 
@@ -26,13 +26,13 @@ public class AutonRedFar extends AutonTemplate {
                         new BezierLine(
                                 new Pose(87.000, 9.000),
 
-                                new Pose(124.000, 9.000) //134
+                                new Pose(120.000, 9.000) //134
                         )
                 ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                 .setVelocityConstraint(10)
                 .addPath(
                         new BezierLine(
-                                new Pose(124.000, 9.000),
+                                new Pose(120.000, 9.000),
 
                                 new Pose(87.000, 9.000)
                         )

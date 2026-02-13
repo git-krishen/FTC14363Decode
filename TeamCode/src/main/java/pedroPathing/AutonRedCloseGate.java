@@ -23,7 +23,7 @@ import subsystems.Outtake;
 import util.RobotConstants;
 import util.RobotHardware;
 
-@Autonomous(name = "AutonRedCloseGate", group = "Test")
+@Autonomous(name = "AutonRedCloseGate", group = "Red")
 public class AutonRedCloseGate extends AutonTemplate {
     private final Pose startPose = new Pose(122,122,Math.toRadians(0));
 

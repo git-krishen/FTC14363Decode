@@ -9,7 +9,7 @@ public class RobotConstants {
         public static String leftRear = "backLeftMotor"; // 2
         public static String rightFront = "frontRightMotor"; // 0
         public static String rightRear = "backRightMotor"; // 3
-        public static Pose autonEndPose = new Pose(124,48,Math.toRadians(0));
+        public static Pose autonEndPose = new Pose(9,9,Math.toRadians(0));
     }
 
     public static class Intake {
@@ -54,9 +54,9 @@ public class RobotConstants {
         public static double encoderOffset = 0;
         public static double turretOffsetX = 2.48;
         public static double turretOffsetY = -1.57;
-        public static double scoreRedX = 139.0;
+        public static double scoreRedX = 142.9;
         public static double scoreRedY = 141.0;
-        public static double scoreBlueX = 0;
+        public static double scoreBlueX = 1.1;
         public static double scoreBlueY = 141.0;
         public static double gearRatio = 29.0/120.0;
         public static double maxAngle = 90;
@@ -71,9 +71,9 @@ public class RobotConstants {
     }
 
     public static class Limelight {
-        public static double axisForward = -1.57; // -40 mm down
-        public static double axisRight = 2.48; // 63 mm right
-        public static double axisUp = 16.54; // 420 mm up (vertical)
-        public static double rotRadius = 0.81; // 20.5 mm radius
+        public static double axisForward = -40/1000.0; // -40 mm down
+        public static double axisRight = 63/1000.0; // 63 mm right
+        public static double axisUp = 420/1000.0; // 420 mm up (vertical)
+        public static double rotRadius = 20.5/1000.0; // 20.5 mm radius
     }
 }

@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import commands.CommandSequenceBuilder;
 import util.RobotConstants;
 
-@Autonomous(name = "AutonRedFarGate", group = "Red")
-public class AutonRedFarGate extends AutonTemplate {
+@Autonomous(name = "CycleHumanFarRed", group = "Test")
+public class CycleHumanFarRed extends AutonTemplate {
     private final Pose startPose = new Pose(87,9,Math.toRadians(0));
 
     // Paths
@@ -26,13 +26,13 @@ public class AutonRedFarGate extends AutonTemplate {
                         new BezierLine(
                                 new Pose(87.000, 9.000),
 
-                                new Pose(132.000, 9.000)
+                                new Pose(120.000, 9.000) //134
                         )
                 ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                 .setVelocityConstraint(10)
                 .addPath(
                         new BezierLine(
-                                new Pose(132.000, 9.000),
+                                new Pose(120.000, 9.000),
 
                                 new Pose(87.000, 9.000)
                         )
@@ -83,9 +83,16 @@ public class AutonRedFarGate extends AutonTemplate {
                         new BezierLine(
                                 new Pose(120.000, 58.000),
 
+                                new Pose(132.000, 60.000)
+                        )
+                ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(30))
+                .addPath(
+                        new BezierCurve(
+                                new Pose(132.000, 60.000),
+                                new Pose(100.573, 62.794),
                                 new Pose(85.000, 85.000)
                         )
-                ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+                ).setLinearHeadingInterpolation(Math.toRadians(30), Math.toRadians(0))
 
                 .build();
 
@@ -121,21 +128,19 @@ public class AutonRedFarGate extends AutonTemplate {
     public void init() {
         super.init();
         autonomousCommand = new CommandSequenceBuilder()
-                .runFeeder()
-                .setTurretAngle(67.5)
+                .setTurretAngle(68)
                 .outtakeStart(RobotConstants.Outtake.outtakeVelocityLong)
-                .shoot(RobotConstants.Outtake.outtakeVelocityLong, 2)
-                .parallel((p) -> p.runFeeder().moveTo(Path1))
+                .delay(2)
                 .shoot(RobotConstants.Outtake.outtakeVelocityLong, 2)
                 .parallel((p) -> p.runFeeder().moveTo(Path2))
                 .shoot(RobotConstants.Outtake.outtakeVelocityLong, 2)
-                .parallel((p) -> p.runFeeder().moveTo(Path3))
-                .setTurretAngle(45)
-                .shoot(RobotConstants.Outtake.outtakeVelocityShort, 2)
-                .parallel((p) -> p.runFeeder().moveTo(Path4))
-                .shoot(RobotConstants.Outtake.outtakeVelocityShort, 2)
-                .outtakeStop()
-                .moveTo(Path5)
+                .parallel((p) -> p.runFeeder().moveTo(Path1))
+                .shoot(RobotConstants.Outtake.outtakeVelocityLong, 2)
+                .parallel((p) -> p.runFeeder().moveTo(Path1))
+                .shoot(RobotConstants.Outtake.outtakeVelocityLong, 2)
+                .parallel((p) -> p.runFeeder().moveTo(Path1))
+                .shoot(RobotConstants.Outtake.outtakeVelocityLong, 2)
+                .parallel((p) -> p.runFeeder().moveTo(Path1))
                 .setTurretAngle(0)
                 .build();
     }

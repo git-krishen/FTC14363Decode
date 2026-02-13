@@ -12,7 +12,7 @@ import com.pedropathing.geometry.Pose;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.Set;
 
 import subsystems.Feeder;
@@ -24,7 +24,7 @@ import util.RobotConstants;
 import util.RobotHardware;
 
 public class TeleopBase extends CommandOpMode {
-    private final RobotHardware robot = RobotHardware.getInstance();
+    protected final RobotHardware robot = RobotHardware.getInstance();
     private GamepadEx driver;
     private GamepadEx driver2;
     private MecanumDrive drivetrain;
@@ -55,23 +55,26 @@ public class TeleopBase extends CommandOpMode {
 
         robot.follower.setPose(RobotConstants.Drivetrain.autonEndPose);
         robot.ll.start();
+        robot.ll.pipelineSwitch(9);
 
         configureBindings();
     }
 
     @Override
     public void run() {
+        robot.ll.updateRobotOrientation(Math.toDegrees(robot.follower.getHeading()+180));
         CommandScheduler.getInstance().run();
         robot.follower.update();
 
-        Pose llPoseEstimate = robot.limelight.getRobotPose().orElse(new Pose(-67,-67,0));
-        robot.telemetryManager.addData("x", robot.follower.getPose().getX() + " | " + llPoseEstimate.getX());
-        robot.telemetryManager.addData("y", robot.follower.getPose().getY() + " | " + llPoseEstimate.getY());
-        robot.telemetryManager.addData("heading", robot.follower.getPose().getHeading() + " | " + llPoseEstimate.getHeading());
+        Pose llPoseEstimate = robot.limelight.getBotPoseMT2().orElse(new Pose(-67,-67,0));
+        Pose mt1 = robot.limelight.getBotPoseMT1().orElse(new Pose(-67,-67,0));
+        robot.telemetryManager.addData("x", robot.follower.getPose().getX() + " | " + llPoseEstimate.getX() + " | " + mt1.getX());
+        robot.telemetryManager.addData("y", robot.follower.getPose().getY() + " | " + llPoseEstimate.getY() + " | " + mt1.getY());
+        robot.telemetryManager.addData("heading", Math.toDegrees(robot.follower.getPose().getHeading()) + " | " + llPoseEstimate.getHeading());
         robot.telemetryManager.addData("turret", turret.getDebugInfo());
         robot.telemetryManager.addData("outtakeVel", outtake.getOuttakeVelocity());
         robot.telemetryManager.addData("maxRPMFrac", robot.outtakeMotor.getMotorType().getAchieveableMaxRPMFraction());
-        robot.telemetryManager.addData("limelight", robot.limelight.getOrientationArrayString());
+        robot.telemetryManager.addData("limelight", Arrays.toString(robot.limelight.getOrientationArrayString()));
         robot.telemetryManager.addData("distance (intake|outtake)", robot.intakeDistanceSensor.getDistance(DistanceUnit.MM) + " | " + robot.outtakeDistanceSensor.getDistance(DistanceUnit.MM));
         robot.telemetryManager.update();
     }
@@ -96,30 +99,59 @@ public class TeleopBase extends CommandOpMode {
             double right = RobotConstants.Limelight.axisRight + Math.sin(Math.toRadians(angle))*RobotConstants.Limelight.rotRadius;
             double up = RobotConstants.Limelight.axisUp;
             robot.limelight.updateLimelightPose(forward, right, up, angle, 15.0, 0.0);
-            if (robot.limelight.hasTarget()) {
-                turret.lockToAprilTag();
-            } else {
-//                turret.setTargetRotationTurret(0);
-
-                double x = robot.follower.getPose().getX();
-                double y = robot.follower.getPose().getY();
-                double botHeading = robot.follower.getPose().getHeading();
-                x += RobotConstants.Turret.turretOffsetX*Math.cos(botHeading) - RobotConstants.Turret.turretOffsetY*Math.sin(botHeading);
-                y += RobotConstants.Turret.turretOffsetX*Math.sin(botHeading) + RobotConstants.Turret.turretOffsetY*Math.cos(botHeading);
-                double reqAngle = Math.atan2(RobotConstants.Turret.scoreRedY-y,RobotConstants.Turret.scoreRedY-x);
-                double delta = reqAngle - botHeading;
-                delta -= Math.PI/2;
-                double finalAngle = Math.toDegrees(Math.atan2(Math.sin(delta),Math.cos(delta)));
-                finalAngle += Math.PI/2;
-                robot.telemetryManager.debug("odoShoot", finalAngle);
-//                turret.setTargetRotationTurret(Math.toDegrees(Math.atan2(Math.sin(delta),Math.cos(delta))));
-            }
+//            if (robot.limelight.hasTarget()) {
+//                turret.lockToAprilTag();
+//            } else {
+////                turret.setTargetRotationTurret(0);
+//
+//                double x = robot.follower.getPose().getX();
+//                double y = robot.follower.getPose().getY();
+//                double botHeading = robot.follower.getPose().getHeading();
+//                x += RobotConstants.Turret.turretOffsetX*Math.cos(botHeading) - RobotConstants.Turret.turretOffsetY*Math.sin(botHeading);
+//                y += RobotConstants.Turret.turretOffsetX*Math.sin(botHeading) + RobotConstants.Turret.turretOffsetY*Math.cos(botHeading);
+//                double reqAngle = Math.atan2(RobotConstants.Turret.scoreRedY-y,RobotConstants.Turret.scoreRedY-x);
+//                double delta = reqAngle - botHeading;
+//                delta -= Math.PI/2;
+//                double finalAngle = Math.toDegrees(Math.atan2(Math.sin(delta),Math.cos(delta)));
+//                finalAngle += Math.PI/2;
+//                robot.telemetryManager.debug("odoShoot", finalAngle);
+////                turret.setTargetRotationTurret(Math.toDegrees(Math.atan2(Math.sin(delta),Math.cos(delta))));
+//            }
         }, turret));
+        driver2.getGamepadButton(GamepadKeys.Button.A).whileHeld(
+                new InstantCommand(() -> {
+                    double angle = turret.getTotalRotationTurret();
+                    double forward = RobotConstants.Limelight.axisForward + Math.cos(Math.toRadians(angle))*RobotConstants.Limelight.rotRadius;
+                    double right = RobotConstants.Limelight.axisRight + Math.sin(Math.toRadians(angle))*RobotConstants.Limelight.rotRadius;
+                    double up = RobotConstants.Limelight.axisUp;
+                    robot.limelight.updateLimelightPose(forward, right, up, angle, 15.0, 0.0);
+                    if (robot.limelight.hasTarget()) {
+                        turret.lockToAprilTag();
+                    } else {
+                        double x = robot.follower.getPose().getX();
+                        double y = robot.follower.getPose().getY();
+                        double botHeading = robot.follower.getPose().getHeading();
+                        x += RobotConstants.Turret.turretOffsetX * Math.cos(botHeading) - RobotConstants.Turret.turretOffsetY * Math.sin(botHeading);
+                        y += RobotConstants.Turret.turretOffsetX * Math.sin(botHeading) + RobotConstants.Turret.turretOffsetY * Math.cos(botHeading);
+                        double reqAngle = Math.atan2(scorePose.getY() - y, scorePose.getX() - x);
+                        double delta = reqAngle - botHeading;
+                        double finalAngle = Math.toDegrees(Math.atan2(Math.sin(delta), Math.cos(delta)));
+//                    robot.telemetryManager.debug("odoShoot", finalAngle);
+                        turret.setTargetRotationTurret(finalAngle);
+                    }
+                }, turret)
+        );
 
         driver.getGamepadButton(GamepadKeys.Button.START).whenPressed(
                 new InstantCommand(() -> {
                     robot.follower.setPose(robot.follower.getPose().setHeading(0));
                 })
+        );
+//        driver2.getGamepadButton(GamepadKeys.Button.START).whenPressed(
+//                new InstantCommand(() -> turret.forceResetTotalRotation())
+//        );
+        driver2.getGamepadButton(GamepadKeys.Button.Y).whenPressed(
+                new InstantCommand(() -> turret.setTargetRotationTurret(0))
         );
 
 //        driver.getGamepadButton(GamepadKeys.Button.LEFT_STICK_BUTTON).whenPressed(
